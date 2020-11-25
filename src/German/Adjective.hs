@@ -1,4 +1,11 @@
-module German.Adjective ( parse, toHtml ) where
+module German.Adjective (
+    parse,
+    toHtml,
+
+    Comparative (..),
+    Superlative (..),
+    parseAttrs
+) where
 
 import Prelude hiding ( word )
 
@@ -18,12 +25,12 @@ instance Serializable Superlative where
     serialize (Superlative sup) = sup
 
 parse = parseWord >:>
-        parseAttribute >:>
+        parseAttrs >:>
         parseMeaning >:>
         parseNote >:>
         parseExamples
 
-parseAttribute = parseComparative >:> parseSuperlative
+parseAttrs = parseComparative >:> parseSuperlative
 
 parseComparative (comp:rests) cons next = next rests (_cons (Comparative comp))
     where _cons comp sup = cons [Attr comp, Attr sup]
