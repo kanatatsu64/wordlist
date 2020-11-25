@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 79571e000243be023e0c2a431095573c2b6e4dbd3fd3078267692201fb04bc14
+-- hash: 846f7d037c9e4e10306f49f8e2de531a94b66db5df7c90de2157f5492b177bb8
 
 name:           wordlist
 version:        0.1.0.0
@@ -35,8 +35,10 @@ library
       German.Conjunction
       German.Noun
       German.Proc
+      German.Utils
       German.Verb
       Html
+      Serializable
   other-modules:
       Paths_wordlist
   hs-source-dirs:
@@ -61,11 +63,17 @@ test-suite wordlist-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      German.NounTest
+      German.Spec
+      German.VerbTest
+      HtmlTest
       Paths_wordlist
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , tasty
+    , tasty-hunit
     , wordlist
   default-language: Haskell2010
