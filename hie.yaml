@@ -1,0 +1,6 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: wordlist:lib
+    - path: "./test"
+      component: wordlist:test:wordlist-test
