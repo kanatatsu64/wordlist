@@ -1,4 +1,5 @@
 module Html (
+    Htmlizable (..),
     TagName (..),
     Content (..),
     Attr (..),
@@ -10,6 +11,12 @@ module Html (
     exportContent,
     cons
 ) where
+
+class Htmlizable a where
+    toHtml :: a -> Html
+
+instance Htmlizable Html where
+    toHtml = id
 
 data TagName = TD | TR
 

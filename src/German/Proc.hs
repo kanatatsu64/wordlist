@@ -7,7 +7,7 @@ import qualified CardClass ( Card (..) )
 import CardClass ( Language ( German ) )
 
 import German.Card ( Card (..), Part (..) )
-import Html ( Html (..) )
+import Html ( Htmlizable (..), Html (..) )
 
 import qualified German.Noun as Noun ( parse, toHtml )
 import qualified German.Verb as Verb( parse, toHtml )
@@ -97,8 +97,8 @@ parsePart (part:rests) cons
     | isAdverb part = Adverb.parse rests (cons Adverb)
     | isConjunction part = Conjunction.parse rests (cons Conjunction)
 
-toHtml :: Card -> Html
-toHtml card = case part card of
+_toHtml :: Card -> Html
+_toHtml card = case part card of
     Noun -> Noun.toHtml card
     Verb -> Verb.toHtml card
     Adjective -> Adjective.toHtml card
@@ -109,6 +109,7 @@ instance CardClass.Card Card where
     cardid = cardid
     language = const German
     word = word
-    toHtml = toHtml
     toCard = toCard
 
+instance Htmlizable Card where
+    toHtml = _toHtml
