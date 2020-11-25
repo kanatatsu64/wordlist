@@ -1,4 +1,12 @@
-module German.Verb ( parse, toHtml ) where
+module German.Verb (
+    parse,
+    toHtml,
+    
+    Kind (..),
+    isIntransitive,
+    isTransitive,
+    parseAttrs
+) where
 
 import Prelude hiding ( word )
 
@@ -46,13 +54,13 @@ isTransitive "transitiv" = True
 isTransitive _ = False
 
 parseAttrs vals@(kind:_)
-    | isIntransitive kind = (parseKindI >:> parseForm) vals
-    | isTransitive kind = parseKindT vals
-
-parseKindI (_:rests) cons next = next rests (_cons Intransitive)
-    where _cons kind form = cons [Attr kind, Attr form]
+    | isIntransitive kind = parseKindI vals
+    | isTransitive kind = (parseKindT >:> parseForm) vals
 
 parseKindT (_:rests) cons next = next rests (_cons Transitive)
+    where _cons kind form = cons [Attr kind, Attr form]
+
+parseKindI (_:_:rests) cons next = next rests (_cons Intransitive)
     where _cons kind = cons [Attr kind]
 
 parseForm (form:rests) cons next = next rests (cons form)
