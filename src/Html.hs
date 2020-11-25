@@ -3,7 +3,12 @@ module Html (
     Content (..),
     Attr (..),
     Html (..),
-    export
+    export,
+
+    exportHtml,
+    exportAttr,
+    exportContent,
+    cons
 ) where
 
 data TagName = TD | TR
@@ -21,19 +26,15 @@ data Html = Tag {
     contents :: [Content]
 }
 
-addChild :: Html -> Html -> Html
-addChild base child = base { contents = (Child child):(contents base) }
-
-addChildren :: Html -> [Html] -> Html
-addChildren base children = base { contents = (map Child children) <> (contents base) }
-
 export :: Html -> String
 export = exportHtml
 
 exportHtml :: Html -> String
-exportHtml html = "<" ++ _name ++ " " ++ _attributes ++ ">" ++ _contents ++ "</" ++ _name ++ ">"
+exportHtml html = "<" ++ _name ++ _attributes ++ ">" ++ _contents ++ "</" ++ _name ++ ">"
     where _name = show (name html)
-          _attributes = cons " " $ map exportAttr (attributes html)
+          _attributes = case attributes html of
+              [] -> ""
+              _ -> " " ++ cons " " (map exportAttr (attributes html))
           _contents = cons "" $ map exportContent (contents html)
 
 exportAttr :: Attr -> String
@@ -44,5 +45,5 @@ exportContent (Text str) = str
 exportContent (Child html) = exportHtml html
 
 cons :: String -> [String] -> String
-cons delim = foldl (\l r -> l ++ delim ++ r) ""
-
+cons delim (l:ls)= foldl (\l r -> l ++ delim ++ r) l ls
+cons _ [] = ""
