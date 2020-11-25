@@ -1,8 +1,11 @@
+{-# LANGUAGE RankNTypes #-}
+
 module German.Noun ( parse, toHtml ) where
 
 import Prelude hiding ( word )
 
-import German.Card ( Card (..), Attr (..), Example (..) )
+import German.Card ( Card (..), Attr (..) )
+import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
 import Html ( Html (..), TagName (..), Content (..) )
 
 data Genre = Male | Female | Neuter
@@ -12,9 +15,11 @@ instance Show Genre where
     show Female = "F."
     show Neuter = "N."
 
-parse = parseWord
-
-parseWord (word:rests) cons = parseAttrs rests (cons word)
+parse = parseWord >:>
+        parseAttrs >:>
+        parseMeaning >:>
+        parseNote >:>
+        parseExamples
 
 isMale :: String -> Bool
 isMale "M." = True
@@ -49,18 +54,10 @@ isNeuter "neutrum" = True
 
 isNeuter _ = False
 
-parseAttrs (pl:gen:rests) cons
-    | isMale gen = parseMeaning rests (cons [Attr pl, Attr Male])
-    | isFemale gen = parseMeaning rests (cons [Attr pl, Attr Female])
-    | isNeuter gen = parseMeaning rests (cons [Attr pl, Attr Neuter])
-
-parseMeaning (meaning:rests) cons = parseNote rests (cons meaning)
-
-parseNote (note:rests) cons = parseExamples rests (cons note)
-
-parseExamples vals cons = cons (loop vals)
-    where loop (original:translation:rests) = (Example original translation):(loop rests)
-          loop [] = []
+parseAttrs (pl:gen:rests) cons next
+    | isMale gen = next rests (cons [Attr pl, Attr Male])
+    | isFemale gen = next rests (cons [Attr pl, Attr Female])
+    | isNeuter gen = next rests (cons [Attr pl, Attr Neuter])
 
 {-
     Card German Noun Name [-en, Male] name illegal []
@@ -75,12 +72,11 @@ parseExamples vals cons = cons (loop vals)
 toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
     where firstTd card = Tag TD [] [Text $ word card ++ " - " ++ consPl (show pl) (word card)] 
           secondTd card = Tag TD [] [Text $ show gen ++ " " ++ meaning card ++ _note]
-          (pl:gen:[]) = attrs card
-          _note = case (note card) of
+          [pl, gen] = attrs card
+          _note = case note card of
             "" -> ""
             _ -> " (" ++ note card ++ ")"
 
 consPl :: String -> String -> String
 consPl ('-':tail) word = word ++ tail
 consPl pl _ = pl
-
