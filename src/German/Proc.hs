@@ -98,7 +98,7 @@ parsePart (part:rests) cons
     | isConjunction part = Conjunction.parse rests (cons Conjunction)
 
 toHtml :: Card -> Html
-toHtml card = case (part card) of
+toHtml card = case part card of
     Noun -> Noun.toHtml card
     Verb -> Verb.toHtml card
     Adjective -> Adjective.toHtml card
