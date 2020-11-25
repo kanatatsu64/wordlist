@@ -1,7 +1,7 @@
 module German.Utils (
     parse,
     parseWord,
-    parseAttribute,
+    parseAttrs,
     parseMeaning,
     parseNote,
     parseExamples,
@@ -16,14 +16,14 @@ defaultParse :: [a] -> (a -> f) -> ([a] -> f -> t) -> t
 defaultParse (val:rests) cons next = next rests (cons val)
 
 parse = parseWord >:>
-        parseAttribute >:>
+        parseAttrs >:>
         parseMeaning >:>
         parseNote >:>
         parseExamples
 
 parseWord = defaultParse
 
-parseAttribute (_:_:rests) cons next = next rests (cons [])
+parseAttrs (_:_:rests) cons next = next rests (cons [])
 
 parseMeaning = defaultParse
 
