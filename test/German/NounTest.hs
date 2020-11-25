@@ -2,6 +2,8 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module German.NounTest (
+    test_all,
+
     test_parse,
     test_toHtml,
 
@@ -30,6 +32,17 @@ import German.Noun (
         parseAttrs,
         consPl
     )
+
+test_all = testGroup "German/Noun" [
+        test_parse,
+        test_toHtml,
+
+        test_isMale,
+        test_isFemale,
+        test_isNeuter,
+        test_parseAttrs,
+        test_consPl
+    ]
 
 test_parse = testCase "parse" do
     let word = "Name"
@@ -88,17 +101,17 @@ test_isMale = testGroup "isMale" [
         test_isMale3
     ]
     where
-        test_isMale1 = testCase "isMale1" do
+        test_isMale1 = testCase "isMale 1" do
             let str = serialize Male
             let actual = isMale str
             let expected = True
             assertEqual "isMale Male" expected actual
-        test_isMale2 = testCase "isMale2" do
+        test_isMale2 = testCase "isMale 2" do
             let str = serialize Female
             let actual = isMale str
             let expected = False
             assertEqual "isMale Female" expected actual
-        test_isMale3 = testCase "isMale3" do
+        test_isMale3 = testCase "isMale 3" do
             let str = serialize Neuter
             let actual = isMale str
             let expected = False
@@ -110,17 +123,17 @@ test_isFemale = testGroup "isFemale" [
         test_isFemale3
     ]
     where
-        test_isFemale1 = testCase "isFemale1" do
+        test_isFemale1 = testCase "isFemale 1" do
             let str = serialize Male
             let actual = isFemale str
             let expected = False
             assertEqual "isFemale Male" expected actual
-        test_isFemale2 = testCase "isFemale2" do
+        test_isFemale2 = testCase "isFemale 2" do
             let str = serialize Female
             let actual = isFemale str
             let expected = True
             assertEqual "isFemale Female" expected actual
-        test_isFemale3 = testCase "isFemale3" do
+        test_isFemale3 = testCase "isFemale 3" do
             let str = serialize Neuter
             let actual = isFemale str
             let expected = False
@@ -132,17 +145,17 @@ test_isNeuter = testGroup "isNeuter" [
         test_isNeuter3
     ]
     where
-        test_isNeuter1 = testCase "isNeuter1" do
+        test_isNeuter1 = testCase "isNeuter 1" do
             let str = serialize Male
             let actual = isNeuter str
             let expected = False
             assertEqual "isNeuter Male" expected actual
-        test_isNeuter2 = testCase "isNeuter2" do
+        test_isNeuter2 = testCase "isNeuter 2" do
             let str = serialize Female
             let actual = isNeuter str
             let expected = False
             assertEqual "isNeuter Female" expected actual
-        test_isNeuter3 = testCase "isNeuter3" do
+        test_isNeuter3 = testCase "isNeuter 3" do
             let str = serialize Neuter
             let actual = isNeuter str
             let expected = True

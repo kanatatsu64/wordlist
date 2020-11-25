@@ -1,7 +1,10 @@
 {-# LANGUAGE BlockArguments #-}
 
 module HtmlTest (
+    test_all,
+
     test_export,
+
     test_exportHtml,
     test_exportAttr,
     test_exportContent,
@@ -12,6 +15,15 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Html
+
+test_all = testGroup "Html" [
+        test_export,
+
+        test_exportHtml,
+        test_exportAttr,
+        test_exportContent,
+        test_cons
+    ]
 
 test_export = testCase "export" do
     let attrs1 = ["attr1-1", "attr1-2"]

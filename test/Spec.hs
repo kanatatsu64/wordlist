@@ -5,16 +5,11 @@ import qualified German.Spec as GermanTest
 
 test_all = testGroup "main" [
         test_html,
-        GermanTest.test_all
+        test_german
     ]
 
-test_html = testGroup "Html" [
-        HtmlTest.test_export,
-        HtmlTest.test_exportHtml,
-        HtmlTest.test_exportAttr,
-        HtmlTest.test_exportContent,
-        HtmlTest.test_cons
-    ]
+test_html = HtmlTest.test_all
+test_german = GermanTest.test_all
 
 main :: IO ()
 main = defaultMain test_all

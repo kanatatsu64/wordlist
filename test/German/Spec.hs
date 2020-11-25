@@ -1,28 +1,23 @@
 module German.Spec (
     test_all,
+
     test_noun,
-    test_verb
+    test_verb,
+    test_adjective
 ) where
 
 import Test.Tasty
 
 import qualified German.NounTest as NounTest
+import qualified German.VerbTest as VerbTest
+import qualified German.AdjectiveTest as AdjectiveTest
 
 test_all = testGroup "German" [
-        test_noun
+        test_noun,
+        test_verb,
+        test_adjective
     ]
 
-test_noun = testGroup "German/Noun" [
-        NounTest.test_parse,
-        NounTest.test_toHtml,
-
-        NounTest.test_isMale,
-        NounTest.test_isFemale,
-        NounTest.test_isNeuter,
-        NounTest.test_parseAttrs,
-        NounTest.test_consPl
-    ]
-
-test_verb = testGroup "German/Verb" [
-
-    ]
+test_noun = NounTest.test_all
+test_verb = VerbTest.test_all
+test_adjective = AdjectiveTest.test_all
