@@ -9,22 +9,23 @@ module German.Card (
 
 import Prelude hiding ( Word )
 
+import Serializable ( Serializable (..) )
 import CardClass ( CardID )
 
 data Example = Example { original :: String, translation :: String }
-data Attr = forall a. Show a => Attr a
+data Attr = forall a. Serializable a => Attr a
 
-instance Show Attr where
-    show (Attr attr) = show attr
+instance Serializable Attr where
+    serialize (Attr attr) = serialize attr
 
 data Part = Noun | Verb | Adjective | Adverb | Conjunction
 
-instance Show Part where
-    show Noun = "N."
-    show Verb = "V."
-    show Adjective = "Adj."
-    show Adverb = "Adv."
-    show Conjunction = "Kon."
+instance Serializable Part where
+    serialize Noun = "N."
+    serialize Verb = "V."
+    serialize Adjective = "Adj."
+    serialize Adverb = "Adv."
+    serialize Conjunction = "Kon."
 
 type Word = String
 type Attrs = [Attr]
@@ -41,4 +42,3 @@ data Card = Card {
     note :: Note,
     examples :: Examples
 }
-

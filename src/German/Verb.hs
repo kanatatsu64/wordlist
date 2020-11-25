@@ -2,15 +2,16 @@ module German.Verb ( parse, toHtml ) where
 
 import Prelude hiding ( word )
 
+import Serializable ( Serializable (..) )
+import Html ( Html (..), TagName (..), Content (..) )
 import German.Card ( Card (..), Attr (..) )
 import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
-import Html ( Html (..), TagName (..), Content (..) )
 
 data Kind = Intransitive | Transitive
 
-instance Show Kind where
-    show Intransitive = "I."
-    show Transitive = "T."
+instance Serializable Kind where
+    serialize Intransitive = "I."
+    serialize Transitive = "T."
 
 parse = parseWord >:>
         parseAttrs >:>
@@ -68,9 +69,8 @@ parseForm (form:rests) cons next = next rests (cons form)
 
 toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
     where firstTd card = Tag TD [] [Text $ word card]
-          secondTd card = Tag TD [] [Text $ show kind ++ " " ++ meaning card ++ _note]
+          secondTd card = Tag TD [] [Text $ serialize kind ++ " " ++ meaning card ++ _note]
           (kind:_) = attrs card
           _note = case note card of
             "" -> ""
             _ -> " (" ++ note card ++ ")"
-

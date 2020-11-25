@@ -1,19 +1,30 @@
 {-# LANGUAGE RankNTypes #-}
 
-module German.Noun ( parse, toHtml ) where
+module German.Noun (
+    parse,
+    toHtml,
+
+    Genre (..),
+    isMale,
+    isFemale,
+    isNeuter,
+    parseAttrs,
+    consPl
+) where
 
 import Prelude hiding ( word )
 
+import Serializable ( Serializable (..) )
+import Html ( Html (..), TagName (..), Content (..) )
 import German.Card ( Card (..), Attr (..) )
 import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
-import Html ( Html (..), TagName (..), Content (..) )
 
 data Genre = Male | Female | Neuter
 
-instance Show Genre where
-    show Male = "M."
-    show Female = "F."
-    show Neuter = "N."
+instance Serializable Genre where
+    serialize Male = "M."
+    serialize Female = "F."
+    serialize Neuter = "N."
 
 parse = parseWord >:>
         parseAttrs >:>
@@ -70,8 +81,8 @@ parseAttrs (pl:gen:rests) cons next
 -}
 
 toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
-    where firstTd card = Tag TD [] [Text $ word card ++ " - " ++ consPl (show pl) (word card)] 
-          secondTd card = Tag TD [] [Text $ show gen ++ " " ++ meaning card ++ _note]
+    where firstTd card = Tag TD [] [Text $ word card ++ " - " ++ consPl (serialize pl) (word card)] 
+          secondTd card = Tag TD [] [Text $ serialize gen ++ " " ++ meaning card ++ _note]
           [pl, gen] = attrs card
           _note = case note card of
             "" -> ""

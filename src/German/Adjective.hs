@@ -2,19 +2,20 @@ module German.Adjective ( parse, toHtml ) where
 
 import Prelude hiding ( word )
 
+import Serializable ( Serializable (..) )
+import Html ( Html (..), TagName (..), Content (..) )
 import German.Card ( Card (..), Attr (..) )
 import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
-import Html ( Html (..), TagName (..), Content (..) )
 
 newtype Comparative = Comparative String
 
-instance Show Comparative where
-    show (Comparative comp) = comp
+instance Serializable Comparative where
+    serialize (Comparative comp) = comp
 
 newtype Superlative = Superlative String
 
-instance Show Superlative where
-    show (Superlative sup) = sup
+instance Serializable Superlative where
+    serialize (Superlative sup) = sup
 
 parse = parseWord >:>
         parseAttribute >:>
@@ -41,7 +42,7 @@ parseSuperlative (sup:rests) cons next = next rests (cons (Superlative sup))
 
 toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
     where firstTd card = Tag TD [] [Text $ word card]
-          secondTd card = Tag TD [] [Text $ show (part card) ++ " " ++ meaning card ++ _note]
+          secondTd card = Tag TD [] [Text $ serialize (part card) ++ " " ++ meaning card ++ _note]
           _note = case note card of
             "" -> ""
             _ -> " (" ++ note card ++ ")"

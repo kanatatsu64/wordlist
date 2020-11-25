@@ -1,4 +1,8 @@
-module CardClass ( Card (..), Language (..), CardID ) where
+module CardClass (
+    Card (..),
+    Language (..),
+    CardID
+) where
 
 import Html ( Html )
 
@@ -12,4 +16,3 @@ class Card a where
     word :: a -> String
     toHtml :: a -> Html
     toCard :: [String] -> a
- 
