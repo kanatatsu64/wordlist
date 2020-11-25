@@ -120,7 +120,7 @@ test_toHtml = testGroup "toHtml" [
             let original = "Ich bin einen Mann."
             let translation = "I am a man."
             let examples = [Example original translation]
-            let card = Card.Card "cardid" Noun word attrs meaning note examples
+            let card = Card.Card "cardid" Verb word attrs meaning note examples
             let expected = Tag TR [] [
                         Child $ Tag TD [] [Text "sein"],
                         Child $ Tag TD [] [Text "I. is (illegal)"]
@@ -137,7 +137,7 @@ test_toHtml = testGroup "toHtml" [
             let original = "Ich habe eines Haus."
             let translation = "I have a house."
             let examples = [Example original translation]
-            let card = Card.Card "cardid" Noun word attrs meaning note examples
+            let card = Card.Card "cardid" Verb word attrs meaning note examples
             let expected = Tag TR [] [
                         Child $ Tag TD [] [Text "haben"],
                         Child $ Tag TD [] [Text "T. have (illegal)"]
