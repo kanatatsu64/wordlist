@@ -3,6 +3,7 @@
 module HtmlTest (
     test_all,
 
+    test_template,
     test_export,
 
     test_exportHtml,
@@ -17,6 +18,7 @@ import Test.Tasty.HUnit
 import Html
 
 test_all = testGroup "Html" [
+        test_template,
         test_export,
 
         test_exportHtml,
@@ -24,6 +26,17 @@ test_all = testGroup "Html" [
         test_exportContent,
         test_cons
     ]
+
+test_template = testCase "template" do
+    let body = Tag SPAN [] [Text "sample"]
+    let expected = "<html>" ++
+                       "<head></head>" ++
+                       "<body>" ++
+                           "<span>sample</span>" ++
+                       "</body>" ++
+                   "</html>"
+    let actual = export $ template body
+    assertEqual "template simple html" expected actual
 
 test_export = testCase "export" do
     let attrs1 = ["attr1-1", "attr1-2"]

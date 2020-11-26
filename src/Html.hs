@@ -4,6 +4,7 @@ module Html (
     Content (..),
     Attr (..),
     Html (..),
+    template,
     export,
 
     exportHtml,
@@ -18,9 +19,13 @@ class Htmlizable a where
 instance Htmlizable Html where
     toHtml = id
 
-data TagName = SPAN | TABLE | CAPTION | TD | TR
+data TagName = HTML | HEAD | BODY | SPAN |
+               TABLE | CAPTION | TD | TR
 
 instance Show TagName where
+    show HTML = "html"
+    show HEAD = "head"
+    show BODY = "body"
     show SPAN = "span"
     show TABLE = "table"
     show CAPTION = "caption"
@@ -35,6 +40,22 @@ data Html = Tag {
     attributes :: [Attr],
     contents :: [Content]
 }
+
+{-
+    template $ Tag SPAN [] [ Text "sample" ]
+    <html>
+        <head></head>
+        <body>
+            <span>sample</span>
+        </body>
+    </html>
+-}
+
+template :: Html -> Html
+template body = Tag HTML [] [
+        Child $ Tag HEAD [] [],
+        Child $ Tag BODY [] [ Child body ]
+    ]
 
 export :: Html -> String
 export = exportHtml
