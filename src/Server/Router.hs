@@ -1,26 +1,20 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE FlexibleInstances #-}
 
 module Server.Router (
     router,
     responder
 ) where
 
-import qualified Data.ByteString.Lazy ( ByteString )
-import Data.ByteString ( ByteString )
-import Data.Text ( Text, pack )
+import Data.Text ( pack )
 import Control.Monad.Writer
 import qualified Control.Monad.State as State
 import Network.HTTP.Types.Method ( Method, methodGet, methodPost )
 import Network.HTTP.Types.URI ( Query )
 import Network.Wai ( lazyRequestBody, queryString, pathInfo, requestMethod, Request, Response )
 
+import Server.Types ( Path, Body, Param )
+import Server.Handler ( Handler, Handlable (..) )
 import Server.Response ( sample, notFound )
-
-type LazyByteString = Data.ByteString.Lazy.ByteString
-
-type Path = [Text]
-type Body = LazyByteString
 
 router :: Method -> Path -> Query -> Body -> Response
 router = buildRouter $ do
@@ -34,21 +28,7 @@ responder request = router method path query <$> ioBody
           query = queryString request
           ioBody = lazyRequestBody request
 
-type Param = (ByteString, Maybe ByteString)
-type Handler = Body -> [Param] -> Response
 type RawPattern = String
-
-class Handlable h where
-    toHandler :: h -> Handler
-
-instance Handlable Handler where
-    toHandler = id
-
-instance Handlable ([Param] -> Response) where
-    toHandler h = \_ params -> h params
-
-instance Handlable Response where
-    toHandler h = \_ _ -> h
 
 queryToParams :: Query -> [Param]
 queryToParams = id
