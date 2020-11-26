@@ -8,6 +8,12 @@ import Server.Application ( app )
 
 port = 3000
 
+{-
+    import Server.Base ( runServer )
+
+    main :: IO ()
+    main = runServer
+-}
 runServer :: IO ()
 runServer = do
     putStrLn $ "Listening on port " ++ show port

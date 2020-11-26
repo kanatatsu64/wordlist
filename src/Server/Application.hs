@@ -4,12 +4,9 @@ module Server.Application (
     app
 ) where
 
-import Network.Wai ( responseLBS, Application )
-import Network.HTTP.Types ( status200 )
-import Network.HTTP.Types.Header ( hContentType )
+import Network.Wai ( Application )
 
-import Server.Router ( )
+import Server.Router ( responder )
 
 app :: Application
-app request respond =
-    respond $ responseLBS status200 [(hContentType, "text/plain")] "Hello world!"
+app request respond = respond =<< responder request
