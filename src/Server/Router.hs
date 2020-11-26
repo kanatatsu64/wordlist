@@ -16,13 +16,13 @@ import Server.Types ( Path, Body, Param )
 import Server.Handler ( Handler, Handlable (..) )
 import Server.Response ( sample, notFound )
 
-router :: Method -> Path -> Query -> Body -> Response
+router :: Method -> Path -> Query -> Body -> IO Response
 router = buildRouter $ do
     get "/" sample
     get "/sample" sample
 
 responder :: Request -> IO Response
-responder request = router method path query <$> ioBody
+responder request = router method path query =<< ioBody
     where method = requestMethod request
           path = pathInfo request
           query = queryString request
@@ -79,11 +79,11 @@ get raw h = create $ Route methodGet (buildPath raw) (toHandler h)
 post :: (Handlable h) => RawPattern -> h -> Router
 post raw h = create $ Route methodPost (buildPath raw) (toHandler h)
 
-buildRouter :: Router -> Method -> Path -> Query -> Body -> Response
+buildRouter :: Router -> Method -> Path -> Query -> Body -> IO Response
 buildRouter rt method path query body =
     case choose routes method path of
         Just (Route _ _ handler) -> handler body params
-        Nothing -> notFound
+        Nothing -> return notFound
     where routes :: [Route]
           routes = runRouter rt
           choose :: [Route] -> Method -> Path -> Maybe Route
