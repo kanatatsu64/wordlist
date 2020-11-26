@@ -5,6 +5,7 @@ import Control.Monad.Writer
 import Control.Monad.Cont
 import Data.Functor.Identity
 
+import Utils ( execCont, contFile )
 import CardClass ( Card (..) )
 import Csv ( parseRow )
 import Html ( Htmlizable (..), template, export )
@@ -21,14 +22,8 @@ import Server.Response ( html )
 -}
 list name desc ifname = html <$> buildHtml name desc ifname
 
-execContT :: (Monad m) => ContT r m r -> m r
-execContT c = runContT c return
-
-execCont :: Cont r r -> r
-execCont c = runIdentity $ execContT c
-
 buildHtml name desc ifname = execCont $ do
-        hifile <- cont $ withFile ifname ReadMode
+        hifile <- contFile ifname ReadMode
 
         return $ do
             cards <- execWriterT (loop hifile)
