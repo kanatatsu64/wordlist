@@ -14,11 +14,11 @@ import Network.Wai ( lazyRequestBody, queryString, pathInfo, requestMethod, Requ
 
 import Server.Types ( Path, Body, Param )
 import Server.Handler ( Handler, Handlable (..) )
-import Server.Response ( sample, notFound )
+import Server.Response ( sample, htmlFile, notFound )
 
 router :: Method -> Path -> Query -> Body -> IO Response
 router = buildRouter $ do
-    get "/" sample
+    get "/" $ htmlFile "client/index.html"
     get "/sample" sample
 
 responder :: Request -> IO Response

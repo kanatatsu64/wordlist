@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a4bbd47c52c64a7c0e38015335c3f3dc66d76e40ad33a45238c46f624bb4b35f
+-- hash: a59e07c2d23852ebf54da8d1a4e3f73b56bf54a97218bb02a7eef631e372a34d
 
 name:           wordlist
 version:        0.1.0.0
@@ -49,6 +49,7 @@ library
       Server.Response
       Server.Router
       Server.Types
+      Utils
   other-modules:
       Paths_wordlist
   hs-source-dirs:
