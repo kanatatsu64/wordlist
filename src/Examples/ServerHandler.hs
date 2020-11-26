@@ -14,11 +14,8 @@ import qualified German.Base as German
 
 import Server.Response ( html )
 
-{- Server/Router.hs
-    import qualified Examples.ServerHandler ( list )
-
-    router = buildRouter $ do
-        get "/list" $ Examples.ServerHandler.list "german" "from text" "resource/German.csv"
+{- 
+    get "/list" $ Examples.ServerHandler.list "german" "from text" "resource/German.csv"
 -}
 list name desc ifname = html <$> buildHtml name desc ifname
 
