@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cc721459bcbac8921aa007c60001ce2efa2227a1201a9dd03de1452aa2bd72d4
+-- hash: e84c7332cb13153ce7fe753c1108381fa703c87e9e7609b46dc23a3c1d24f860
 
 name:           wordlist
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Bundle
       CardClass
+      Csv
       German.Adjective
       German.Adverb
       German.Card
@@ -45,6 +46,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , mtl
   default-language: Haskell2010
 
 executable wordlist-exe
@@ -56,6 +58,7 @@ executable wordlist-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , mtl
     , wordlist
   default-language: Haskell2010
 
@@ -63,6 +66,7 @@ test-suite wordlist-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      CsvTest
       German.AdjectiveTest
       German.AdverbTest
       German.ConjunctionTest
@@ -76,6 +80,7 @@ test-suite wordlist-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , mtl
     , tasty
     , tasty-hunit
     , wordlist
