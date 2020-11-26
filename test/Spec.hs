@@ -18,4 +18,4 @@ test_bundle = BundleTest.test_all
 test_german = GermanTest.test_all
 
 main :: IO ()
-main = defaultMain test_html
+main = defaultMain test_all
