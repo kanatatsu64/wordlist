@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 0bffd98e311ed0d4fbb1ab66019f0d34350c33653f743bea0b6106609634d3e9
+-- hash: fb5a95e79b3145670089700c9ceea1259d63d99435e5cb48ac66bbf2630b005a
 
 name:           wordlist
 version:        0.1.0.0
@@ -30,8 +30,10 @@ library
       Bundle
       CardClass
       Csv
+      Examples.CsvToHtml
       German.Adjective
       German.Adverb
+      German.Base
       German.Card
       German.Conjunction
       German.Noun
