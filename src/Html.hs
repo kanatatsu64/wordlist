@@ -18,9 +18,12 @@ class Htmlizable a where
 instance Htmlizable Html where
     toHtml = id
 
-data TagName = TD | TR
+data TagName = SPAN | TABLE | CAPTION | TD | TR
 
 instance Show TagName where
+    show SPAN = "span"
+    show TABLE = "table"
+    show CAPTION = "caption"
     show TD = "td"
     show TR = "tr"
 
