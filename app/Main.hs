@@ -1,6 +1,6 @@
 module Main where
 
-import Bundle
+import Server.Base ( runServer )
 
 main :: IO ()
-main = print "ok"
+main = runServer

@@ -24,6 +24,7 @@ dependencies:
 - bytestring
 - text
 - wai
+- wai-extra
 - warp
 - http-types
 - base >= 4.7 && < 5

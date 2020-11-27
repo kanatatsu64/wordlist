@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js" integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ==" crossorigin="anonymous"></script>
+        <script>
+            window.onload = () => {
+                const form = document.getElementById ("uploadForm")
+                form.onsubmit = event => {
+                    event.preventDefault ()
+                    const data = new FormData (form)
+                    axios.post ('/csv/upload', data)
+                        .catch (err => {
+                            alert ("an error occurred")
+                            throw err
+                        })
+                }
+            }
+        </script>
+    </head>
+    <body>
+        Choose a CSV file to upload.
+        <form action="#" id="uploadForm">
+            <input type="file" name="csvFile">
+            <input type="submit">
+        </form>
+    </body>
+</html>

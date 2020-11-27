@@ -6,7 +6,7 @@ module Server.Application (
 
 import Network.Wai ( Application )
 
-import Server.Router ( responder )
+import Server.Router ( root )
 
 app :: Application
-app request respond = respond =<< responder request
+app request respond = respond =<< root request

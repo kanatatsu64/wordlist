@@ -1,35 +1,51 @@
-{-# LANGUAGE FlexibleInstances #-}
-
 module Server.Handler (
     Handler,
-    Handlable (..)
+    handler,
+    sample,
+    html,
+    htmlFile,
+    uploader,
+    ok,
+    notFound,
+    error
 ) where
 
-import Network.Wai ( Response )
+import Prelude hiding ( error )
 
-import Server.Types ( Body, Param )
+import Network.Wai.Parse ( FileInfo )
 
-type Handler = Body -> [Param] -> IO Response
+import Server.Types ( LazyByteString, ByteString )
+import Server.Internal.Handler ( Handler (..), Handlable )
+import qualified Server.Response as Response (
+        sample,
+        html,
+        htmlFile,
+        uploader,
+        ok,
+        notFound,
+        error
+    )
 
-class Handlable h where
-    toHandler :: h -> Handler
+handler :: Handlable h => h -> Handler
+handler = Handler
 
-instance Handlable Handler where
-    toHandler = id
+sample :: Handler
+sample = handler Response.sample
 
-instance Handlable (IO Handler) where
-    toHandler m = \body params -> do
-        h <- m
-        h body params
+html :: String -> Handler
+html str =  handler $ Response.html str
 
-instance Handlable ([Param] -> Response) where
-    toHandler h = \_ params -> return $ h params
+htmlFile :: String -> Handler
+htmlFile path = handler $ Response.htmlFile path
 
-instance Handlable ([Param] -> IO Response) where
-    toHandler h = \_ params -> h params
+uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Handler
+uploader callback = handler $ Response.uploader callback
 
-instance Handlable Response where
-    toHandler h = \_ _ -> return h
+ok :: Handler
+ok = handler Response.ok
 
-instance Handlable (IO Response) where
-    toHandler h = \_ _ -> h
+notFound :: Handler
+notFound = handler Response.notFound
+
+error :: String -> Handler
+error msg = handler $ Response.error msg

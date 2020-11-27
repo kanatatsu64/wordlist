@@ -1,4 +1,4 @@
-module Examples.ServerHandler ( list ) where
+module Examples.ServerResponse ( list ) where
 
 import System.IO
 import Control.Monad.Writer
@@ -17,7 +17,7 @@ import Server.Response ( html )
 {- 
     get "/list" $ Examples.ServerHandler.list "german" "from text" "resource/German.csv"
 -}
-list name desc ifname = html <$> buildHtml name desc ifname
+list name desc ifname = html =<< buildHtml name desc ifname
 
 buildHtml name desc ifname = execCont $ do
         hifile <- contFile ifname ReadMode
