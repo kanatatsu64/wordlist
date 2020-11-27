@@ -1,0 +1,16 @@
+{
+  "name": "wordlist",
+  "version": "1.0.0",
+  "description": "wordlist client program",
+  "main": "index.js",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "webpack": "^5.8.0"
+  },
+  "scripts": {
+    "build": "webpack"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.2.0"
+  }
+}
