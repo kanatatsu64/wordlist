@@ -17,7 +17,9 @@ test_all = testGroup "Utils" [
 
 test_split = testGroup "split" [
         test_split1,
-        test_split2
+        test_split2,
+        test_split3,
+        test_split4
     ]
     where
         test_split1 = testCase "split 1" do
@@ -30,3 +32,13 @@ test_split = testGroup "split" [
             let expected = [" ", " a  ", ""]
             let actual = split ',' str
             assertEqual "split str with empty parts" expected actual
+        test_split3 = testCase "split 3" do
+            let str = "a"
+            let expected = ["a"]
+            let actual = split ',' str
+            assertEqual "split str without delimiter" expected actual
+        test_split4 = testCase "split 4" do
+            let str = ""
+            let expected = [""]
+            let actual = split ',' str
+            assertEqual "split empty str" expected actual
