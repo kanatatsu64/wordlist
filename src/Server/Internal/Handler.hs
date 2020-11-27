@@ -4,14 +4,44 @@
 module Server.Internal.Handler (
     Handler (..),
     Controller,
-    Handlable (..)
+    Handlable (..),
+    Env (..),
+    gets,
+    getEnv,
+    getBody,
+    getParams,
+    getRequest
 ) where
 
+import Control.Monad.Reader
 import Network.Wai ( Request, Response )
 
 import Server.Types ( Body, Param )
 
 data Handler = forall h. Handlable h => Handler h
+
+data Env = Env {
+    body :: Body,
+    params :: [Param],
+    request :: Request
+}
+
+type HandlerDSL a = Reader Env a
+
+getEnv :: HandlerDSL Env
+getEnv = ask
+
+gets :: (Env -> a) -> HandlerDSL a
+gets = asks
+
+getBody :: HandlerDSL Body
+getBody = gets body
+
+getParams :: HandlerDSL [Param]
+getParams = gets params
+
+getRequest :: HandlerDSL Request
+getRequest = gets request
 
 type Controller = Body -> [Param] -> Request -> IO Response
 
@@ -20,6 +50,11 @@ class Handlable h where
 
 instance Handlable Controller where
     toController = id
+
+instance Handlable (HandlerDSL (IO Response)) where
+    toController m = \body params request ->
+        runReader m $ Env body params request
+
 {-
     instance Handlable (IO Controller) where
         toController m = \request body params -> do

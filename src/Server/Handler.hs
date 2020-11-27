@@ -1,6 +1,12 @@
 module Server.Handler (
     Handler,
     handler,
+    gets,
+    getEnv,
+    getBody,
+    getParams,
+    getRequest,
+
     sample,
     html,
     htmlFile,
@@ -15,7 +21,15 @@ import Prelude hiding ( error )
 import Network.Wai.Parse ( FileInfo )
 
 import Server.Types ( LazyByteString, ByteString )
-import Server.Internal.Handler ( Handler (..), Handlable )
+import Server.Internal.Handler (
+        Handler (..),
+        Handlable,
+        gets,
+        getEnv,
+        getBody,
+        getParams,
+        getRequest
+    )
 import qualified Server.Response as Response (
         sample,
         html,
