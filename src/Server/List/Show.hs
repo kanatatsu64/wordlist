@@ -11,5 +11,5 @@ import Server.Handler ( handler )
 import Examples.ServerResponse ( list )
 
 getHandler = handler $ \params -> case lookup (encode "name") params of
-    Just name -> list (decode name) "" $ "resource/" ++ (decode name) ++ ".csv"
+    Just name -> list (decode name) "" $ "resource/" ++ decode name ++ ".csv"
     Nothing -> error "name is not given"

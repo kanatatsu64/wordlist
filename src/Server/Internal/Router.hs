@@ -9,7 +9,7 @@ module Server.Internal.Router (
 
 import Prelude hiding ( head, tail )
 
-import Data.Text ( pack, unpack, head, tail )
+import Data.Text ( pack, unpack )
 import Data.Text.Encoding ( encodeUtf8 )
 import Control.Monad.Writer
 import qualified Control.Monad.State as State
