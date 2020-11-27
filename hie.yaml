@@ -1,5 +1,7 @@
 cradle:
   stack:
+    - path: "./app"
+      component: wordlist:exe:wordlist-exe
     - path: "./src"
       component: wordlist:lib
     - path: "./test"
