@@ -19,18 +19,23 @@ class Htmlizable a where
 instance Htmlizable Html where
     toHtml = id
 
-data TagName = HTML | HEAD | BODY | SPAN |
-               TABLE | CAPTION | TD | TR
+data TagName = HTML | HEAD | BODY | SPAN | A |
+               TABLE | CAPTION | TD | TR |
+               UL | OL | LI
 
 instance Show TagName where
     show HTML = "html"
     show HEAD = "head"
     show BODY = "body"
     show SPAN = "span"
+    show A = "a"
     show TABLE = "table"
     show CAPTION = "caption"
     show TD = "td"
     show TR = "tr"
+    show UL = "ul"
+    show OL = "ol"
+    show LI = "li"
 
 data Content = Text String | Child Html
 type Attr = String
