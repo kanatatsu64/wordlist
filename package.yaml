@@ -27,6 +27,7 @@ dependencies:
 - wai-extra
 - warp
 - http-types
+- directory
 - base >= 4.7 && < 5
 
 library:

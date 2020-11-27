@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fc3ea2d4491672cd38aeb966142eeb80f1e6739c8faefab0d4238d49735848b3
+-- hash: 5099c132534950b7f303982903813bc3a2c260d99fcb2e714c1a4d915ad4a78a
 
 name:           wordlist
 version:        0.1.0.0
@@ -30,6 +30,7 @@ library
       Bundle
       CardClass
       Csv
+      Directory
       Examples.CsvToHtml
       Examples.ServerResponse
       German.Adjective
@@ -63,6 +64,7 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
     , http-types
     , mtl
     , text
@@ -81,6 +83,7 @@ executable wordlist-exe
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
     , http-types
     , mtl
     , text
@@ -96,6 +99,7 @@ test-suite wordlist-test
   other-modules:
       BundleTest
       CsvTest
+      DirectoryTest
       German.AdjectiveTest
       German.AdverbTest
       German.ConjunctionTest
@@ -103,7 +107,8 @@ test-suite wordlist-test
       German.Spec
       German.VerbTest
       HtmlTest
-      Utils
+      TestUtils
+      UtilsTest
       Paths_wordlist
   hs-source-dirs:
       test
@@ -111,6 +116,7 @@ test-suite wordlist-test
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , directory
     , http-types
     , mtl
     , tasty
