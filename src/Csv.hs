@@ -1,33 +1,15 @@
 module Csv (
     parseRow,
 
-    split,
     trim
 ) where
 
 import Control.Monad.State
 
-parseRow :: String -> [String]
-parseRow row = map trim (split row)
+import Utils ( split )
 
-split :: String -> [String]
-split str = reverse $ execState (loop str) [""]
-    where loop :: String -> State [String] ()
-          loop [] = return ()
-          loop (',':rests) = do
-              modify ([""] <>)
-              loop rests
-          loop (x:rests) = do
-              addChar x
-              loop rests
-          addChar :: Char -> State [String] ()
-          addChar x = do
-              css <- get
-              case css of
-                  (c:cs) -> do
-                      let c' = c ++ [x]
-                      put (c':cs)
-                  [] -> put [[x]]
+parseRow :: String -> [String]
+parseRow row = map trim (split ',' row)
 
 trim :: String -> String
 trim str = evalState (loop str) False

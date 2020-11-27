@@ -4,18 +4,16 @@ module CsvTest (
     test_all,
 
     test_parseRow,
-    test_split,
     test_trim
 ) where
 
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Csv ( parseRow, split, trim )
+import Csv ( parseRow, trim )
 
 test_all = testGroup "Csv" [
         test_parseRow,
-        test_split,
         test_trim
     ]
 
@@ -46,22 +44,6 @@ test_parseRow = testGroup "parseRow" [
             let expected = ["", "a", "", ""]
             let actual = parseRow str
             assertEqual "parseRow str with empty columns 2" expected actual
-
-test_split = testGroup "split" [
-        test_split1,
-        test_split2
-    ]
-    where
-        test_split1 = testCase "split 1" do
-            let str = "a, b, c"
-            let expected = ["a", " b", " c"]
-            let actual = split str
-            assertEqual "split simple str" expected actual
-        test_split2 = testCase "split 2" do
-            let str = " , a  ,"
-            let expected = [" ", " a  ", ""]
-            let actual = split str
-            assertEqual "split str with empty parts" expected actual
 
 test_trim = testGroup "trim" [
         test_trim1,
