@@ -1,3 +1,6 @@
+# stack on travis ci document
+# https://docs.haskellstack.org/en/stable/travis_ci/
+
 # Choose a build environment
 dist: xenial
 
