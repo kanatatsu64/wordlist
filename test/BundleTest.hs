@@ -11,7 +11,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Html ( Htmlizable (..), export )
-import Utils ( CardMock (..) )
+import TestUtils ( CardMock (..) )
 import Bundle ( Bundle (..) )
 
 test_all = testGroup "Bundle" [
