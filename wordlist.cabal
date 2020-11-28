@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5099c132534950b7f303982903813bc3a2c260d99fcb2e714c1a4d915ad4a78a
+-- hash: 62cdee01a0f0a13f59570f0dfaf017fd40b5dfb82b1177e08ca89c4f7f9f8b55
 
 name:           wordlist
 version:        0.1.0.0
@@ -68,6 +68,7 @@ library
     , http-types
     , mtl
     , text
+    , transformers
     , wai
     , wai-extra
     , warp
@@ -87,6 +88,7 @@ executable wordlist-exe
     , http-types
     , mtl
     , text
+    , transformers
     , wai
     , wai-extra
     , warp
@@ -122,6 +124,7 @@ test-suite wordlist-test
     , tasty
     , tasty-hunit
     , text
+    , transformers
     , wai
     , wai-extra
     , warp
