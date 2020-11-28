@@ -61,7 +61,7 @@ static base = handler $ do
     mpath <- lookup "path" <$> getParams
     case join mpath of
         Just (decode -> path) -> return $ Response.file (base </> path) (Just $ ctype path)
-        Nothing -> return $ Response.error "Not Found"
+        Nothing -> return Response.notFound
     where ctype path = case getExt path of
             "html" -> "text/html"
             "js" -> "text/javascript"
