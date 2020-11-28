@@ -9,6 +9,7 @@ module Directory (
     listCsvNames,
     withExt,
     delExt,
+    getExt,
     getName,
     getDir,
     cd,
@@ -64,6 +65,12 @@ delExt path
           delLast [_] = ""
           delLast [p, _] = p
           delLast (p:ps) = p ++ "." ++ delLast ps
+
+getExt :: FilePath -> String
+getExt path
+    | length parts >= 2 = last parts
+    | otherwise = ""
+    where parts = split '.' (getName path)
 
 getName :: FilePath -> FilePath
 getName path = last $ split '/' path

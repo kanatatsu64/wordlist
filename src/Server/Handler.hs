@@ -1,3 +1,6 @@
+{-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE OverloadedStrings #-}
+
 module Server.Handler (
     Handler,
     handler,
@@ -8,6 +11,8 @@ module Server.Handler (
     getRequest,
 
     sample,
+    static,
+    file,
     html,
     htmlFile,
     uploader,
@@ -18,9 +23,12 @@ module Server.Handler (
 
 import Prelude hiding ( error )
 
+import Control.Monad ( join )
 import Network.Wai.Parse ( FileInfo )
 
-import Server.Types ( LazyByteString, ByteString )
+import Directory ( (</>), getExt )
+
+import Server.Types ( LazyByteString, ByteString, decode )
 import Server.Internal.Handler (
         Handler (..),
         Handlable,
@@ -31,7 +39,9 @@ import Server.Internal.Handler (
         getRequest
     )
 import qualified Server.Response as Response (
+        ContentType,
         sample,
+        file,
         html,
         htmlFile,
         uploader,
@@ -46,10 +56,30 @@ handler = Handler
 sample :: Handler
 sample = handler Response.sample
 
+static :: FilePath -> Handler
+static base = handler $ do
+    mpath <- lookup "path" <$> getParams
+    case join mpath of
+        Just (decode -> path) -> return $ Response.file (base </> path) (Just $ ctype path)
+        Nothing -> return $ Response.error "Not Found"
+    where ctype path = case getExt path of
+            "html" -> "text/html"
+            "js" -> "text/javascript"
+            "csv" -> "text/csv"
+            "css" -> "text/css"
+            "json" -> "application/json"
+            "png" -> "image/png"
+            "jpg" -> "image/jpeg"
+            "jpeg" -> "image/jpeg"
+            _ -> "text/plain"
+
+file :: FilePath -> Maybe Response.ContentType -> Handler
+file path ctype = handler $ Response.file path ctype
+
 html :: String -> Handler
 html str =  handler $ Response.html str
 
-htmlFile :: String -> Handler
+htmlFile :: FilePath -> Handler
 htmlFile path = handler $ Response.htmlFile path
 
 uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Handler

@@ -1,8 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Server.Response (
+    ContentType,
     sample,
     html,
+    file,
     htmlFile,
     uploader,
     notFound,
@@ -19,13 +21,19 @@ import Network.Wai.Parse ( parseRequestBody, lbsBackEnd, FileInfo )
 
 import Server.Types ( lazyEncode, LazyByteString, ByteString )
 
+type ContentType = ByteString
+
 sample :: IO Response
 sample = return $ responseLBS status200 [(hContentType, "text/plain")] "Hello world!"
+
+file :: FilePath -> Maybe ContentType-> IO Response
+file path (Just ctype) = return $ responseFile status200 [(hContentType, ctype)] path Nothing
+file path Nothing = return $ responseFile status200 [] path Nothing
 
 html :: String -> IO Response
 html str = return $ responseLBS status200 [(hContentType, "text/html")] $ lazyEncode str
 
-htmlFile :: String -> IO Response
+htmlFile :: FilePath -> IO Response
 htmlFile path = return $ responseFile status200 [(hContentType, "text/html")] path Nothing
 
 uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Request -> IO Response
