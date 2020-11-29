@@ -6,12 +6,14 @@ module Server.Router (
 
 import Server.Internal.Router ( Router, responder, get, mount, (~>) )
 import Server.Handler ( sample, static )
+import qualified Server.Api.Router as Api ( router )
 import qualified Server.Csv.Router as Csv ( router )
 import qualified Server.List.Router as List ( router )
 
 router :: Router
 router = do
     get "/" ~> get "/index.html"
+    mount "/api" Api.router
     get "/sample" sample
 
     mount "/csv" Csv.router
