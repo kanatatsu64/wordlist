@@ -51,7 +51,7 @@ insert p@(key, _) ps
     | otherwise = p:ps
 
 upsert :: Param -> [Param] -> [Param]
-upsert p@(key, mval) (p'@(key', _):ps)
+upsert p@(key, _) (p'@(key', _):ps)
     | key == key' = p:ps
     | otherwise = p':upsert p ps
 upsert p [] = [p]
