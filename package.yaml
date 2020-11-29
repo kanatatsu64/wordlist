@@ -29,6 +29,7 @@ dependencies:
 - warp
 - http-types
 - directory
+- uuid
 - base >= 4.7 && < 5
 
 library:
