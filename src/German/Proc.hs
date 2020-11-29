@@ -109,6 +109,7 @@ instance CardClass.Card Card where
     cardid = cardid
     language = const German
     word = word
+    meaning = meaning
     toCard = toCard
 
 instance Htmlizable Card where
