@@ -13,6 +13,7 @@ module Server.Handler (
     sample,
     static,
     file,
+    json,
     html,
     htmlFile,
     uploader,
@@ -42,6 +43,7 @@ import qualified Server.Response as Response (
         ContentType,
         sample,
         file,
+        json,
         html,
         htmlFile,
         uploader,
@@ -75,6 +77,9 @@ static base = handler $ do
 
 file :: FilePath -> Maybe Response.ContentType -> Handler
 file path ctype = handler $ Response.file path ctype
+
+json :: String -> Handler
+json str = handler $ Response.json str
 
 html :: String -> Handler
 html str =  handler $ Response.html str

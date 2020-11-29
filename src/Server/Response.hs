@@ -4,6 +4,7 @@ module Server.Response (
     ContentType,
     sample,
     html,
+    json,
     file,
     htmlFile,
     uploader,
@@ -35,6 +36,9 @@ html str = return $ responseLBS status200 [(hContentType, "text/html")] $ lazyEn
 
 htmlFile :: FilePath -> IO Response
 htmlFile path = return $ responseFile status200 [(hContentType, "text/html")] path Nothing
+
+json :: String -> IO Response
+json str = return $ responseLBS status200 [(hContentType, "application/json")] $ lazyEncode str
 
 uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Request -> IO Response
 uploader callback request = do
