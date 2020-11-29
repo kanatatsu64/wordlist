@@ -1,12 +1,16 @@
 module Server.Api.Csv.Types (
     Language (..),
-    Word (..),
+    Card (..),
     Csv (..),
     convertLanguage,
-    convertCardToWord
+    convertCard,
+    replaceId
 ) where
 
 import Prelude hiding ( Word )
+
+import qualified Data.UUID as UUID ( toString )
+import qualified Data.UUID.V4 as UUID ( nextRandom )
 
 import Server.Json ( Json (..), Ary (..), Dict (..), Rec (..) )
 import qualified CardClass ( Language (..), Card (..) )
@@ -14,20 +18,22 @@ import qualified CardClass ( Language (..), Card (..) )
 data Language = Japanese | English | Chinese | French | German
 
 instance Json Language where
-    jsonify Japanese = jsonify "japanese"
-    jsonify English = jsonify "english"
-    jsonify Chinese = jsonify "chinese"
-    jsonify French = jsonify "french"
-    jsonify German = jsonify "german"
+    jsonify Japanese = jsonify "Japanese"
+    jsonify English = jsonify "English"
+    jsonify Chinese = jsonify "Chinese"
+    jsonify French = jsonify "French"
+    jsonify German = jsonify "German"
 
-data Word = Word {
+data Card = Card {
+    cardid :: String,
     language :: Language,
     word :: String,
     meaning :: String
 }
 
-instance Json Word where
-    jsonify (Word language word meaning) = jsonify $ Dict [
+instance Json Card where
+    jsonify (Card cardid language word meaning) = jsonify $ Dict [
+            Rec "cardid" cardid,
             Rec "language" language,
             Rec "word" word,
             Rec "meaning" meaning
@@ -40,19 +46,25 @@ convertLanguage CardClass.Chinese =Chinese
 convertLanguage CardClass.French = French
 convertLanguage CardClass.German = German
 
-convertCardToWord :: CardClass.Card a => a -> Word
-convertCardToWord card = Word language word meaning
-    where language = convertLanguage $ CardClass.language card
+convertCard :: CardClass.Card a => a -> Card
+convertCard card = Card cardid language word meaning
+    where cardid = CardClass.cardid card
+          language = convertLanguage $ CardClass.language card
           word = CardClass.word card
           meaning = CardClass.meaning card
 
 data Csv = Csv {
     name :: String,
-    words :: [Word]
+    cards :: [Card]
 }
 
 instance Json Csv where
-    jsonify (Csv name words) = jsonify $ Dict [
+    jsonify (Csv name cards) = jsonify $ Dict [
             Rec "name" name,
-            Rec "words" (Ary words)
+            Rec "cards" (Ary cards)
         ]
+
+replaceId :: Card -> IO Card
+replaceId card = do
+    uuid <- UUID.nextRandom
+    return $ card { cardid = UUID.toString uuid }
