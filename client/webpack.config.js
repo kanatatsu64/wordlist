@@ -26,7 +26,7 @@ module.exports = {
     },
     plugins: [
         new CleanWebpackPlugin({
-            cleanOnceBeforeBuildPatterns: ['**/*', '!.gitkeep']
+            cleanOnceBeforeBuildPatterns: ['**/*', '!.gitignore', '!.gitkeep']
         }),
         new HtmlWebpackPlugin({
             chunks: ['top'],
