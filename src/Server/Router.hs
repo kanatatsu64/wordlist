@@ -22,7 +22,7 @@ router = do
     get "/redirect" ~> get "/"
 
     {- static files -}
-    get "/dist/*" $ static "client/dist/"
-    get "/*" $ static "client/public/"
+    get "/resource/*" $ static "resource/"
+    get "/*" $ static "client/dist/"
 
 root = responder router
