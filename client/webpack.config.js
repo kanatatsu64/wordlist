@@ -15,11 +15,13 @@ module.exports = {
         rules: [
             {
                 test: /(\.tsx|\.ts)$/,
+                include: path.resolve(__dirname, 'src'),
                 exclude: /node_modules/,
                 loader: 'ts-loader'
             },
             {
                 test: /\.scss$/,
+                include: path.resolve(__dirname, 'src'),
                 use: [
                     'style-loader',
                     {
