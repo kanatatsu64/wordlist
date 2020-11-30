@@ -1,0 +1,9 @@
+.item {
+    border-color: transparent;
+    border-style: solid;
+    border-width: 1px;
+    padding: 3px;
+    &:hover {
+        border-color: black;
+    }
+}
