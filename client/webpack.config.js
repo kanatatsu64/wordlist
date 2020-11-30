@@ -4,11 +4,11 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
     entry: {
-        top: './src/index.tsx',
-        csv: './src/Csv/index.tsx'
+        top: path.resolve(__dirname, 'src/index.tsx'),
+        csv: path.resolve(__dirname, 'src/Csv/index.tsx')
     },
     output: {
-        filename: '[name].[contenthash].js',
+        filename: '[name].[contenthash].bundle.js',
         path: path.resolve(__dirname, 'dist')
     },
     module: {
@@ -49,5 +49,23 @@ module.exports = {
             filename: 'index.html',
             template: 'src/index.html'
         })
-    ]
+    ],
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                libs: {
+                    test: /src[\/\\]Lib/,
+                    name: 'libs',
+                    chunks: 'all',
+                    enforce: true
+                },
+                vendors: {
+                    test: /node_modules/,
+                    name: 'vendors',
+                    chunks: 'all',
+                    enforce: true
+                }
+            }
+        }
+    }
 };
