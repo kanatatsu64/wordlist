@@ -9,6 +9,7 @@ type DeletePropsType = {
 export const Delete: React.FC<DeletePropsType> = props => {
     const onClick = (event: React.MouseEvent) => {
         event.preventDefault()
+        event.stopPropagation()
         props.onClick()
     }
 
