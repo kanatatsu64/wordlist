@@ -3,6 +3,26 @@
 
 [test locally](http://localhost:3000)
 
+## プログラムの実行方法
+
+### Frontend
+
+```shell
+cd client
+yarn run build
+```
+
+### Backend + WebFramework
+
+```shell
+stack build
+stack exec wordlist-exe
+```
+
+### Browser
+
+`http://localhost:3000`にアクセスする。
+
 ## テストの実行方法
 
 ### Frontent
