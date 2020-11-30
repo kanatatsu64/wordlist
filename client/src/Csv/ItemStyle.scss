@@ -1,0 +1,13 @@
+.item {
+    overflow: hidden;
+    cursor: default;
+    .name {
+        float: left;
+    }
+    .control {
+        float: right;
+    }
+    &::after {
+        clear: both;
+    }
+}

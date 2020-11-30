@@ -1,5 +1,8 @@
 import React from 'react'
 
+import style from './ItemStyle.scss'
+import { Delete } from 'Lib/Icon'
+
 type PropsType = {
     name: String,
     onSelect: (name: String) => void,
@@ -13,9 +16,13 @@ export const Item: React.FC<PropsType> = props => {
     const onSelect = () => props.onSelect(name)
 
     return (
-        <div onClick={ onSelect }>
-            <span>{ name }</span>
-            <button onClick={ onDelete }>delete</button>
+        <div className={ style.item } onClick={ onSelect }>
+            <div className={ style.name }>
+                <span>{ name }</span>
+            </div>
+            <div className={ style.control }>
+                <Delete onClick={ onDelete }></Delete>
+            </div>
         </div>
     )
 }
