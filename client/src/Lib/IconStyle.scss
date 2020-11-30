@@ -1,0 +1,10 @@
+.delete {
+    border: none;
+    display: inline-block;
+    .i {
+        cursor: default;
+        background-color: red;
+        color: white;
+        font-size: inherit;
+    }
+}
