@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 import { getNameList } from 'Api/Csv'
 import { Item } from 'Csv/Item'
 import { FCList } from 'Lib/FCList'
+import { ListItem } from 'Lib/ListItem'
 
 type PropsType = { }
 
@@ -25,16 +26,17 @@ export const TopPage: React.FC<PropsType> = props => {
     }
 
     const getItem = (name: string) => (
-        <Item name={ name }
-                onSelect={ onSelect }
-                onDelete={ onDelete }
-        ></Item>
+        <ListItem>
+            <Item name={ name }
+                  onSelect={ onSelect }
+                  onDelete={ onDelete }
+            ></Item>
+        </ListItem>
     )
     const getKey = (name: string) => name
 
     return (
         <div>
-            <h1>Wordlist</h1>
             <FCList values={ csvNames } itemGen={ getItem } keyGen={ getKey }></FCList>
         </div>
     )
