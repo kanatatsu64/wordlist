@@ -19,12 +19,13 @@ module.exports = {
                 loader: 'ts-loader'
             },
             {
-                tset: /\.scss$/,
+                test: /\.scss$/,
                 use: [
                     'style-loader',
                     {
                         loader: 'css-loader',
                         options: {
+                            modules: true,
                             importLoaders: 1
                         }
                     },
