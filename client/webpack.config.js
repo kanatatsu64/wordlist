@@ -17,11 +17,24 @@ module.exports = {
                 test: /(\.tsx|\.ts)$/,
                 exclude: /node_modules/,
                 loader: 'ts-loader'
+            },
+            {
+                tset: /\.scss$/,
+                use: [
+                    'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 1
+                        }
+                    },
+                    'sass-loader'
+                ]
             }
         ]
     },
     resolve: {
-        extensions: [ '.tsx', '.ts', '.js' ],
+        extensions: [ '.tsx', '.ts', '.js', '.scss', '.css' ],
         modules: [ path.resolve(__dirname, 'src'), 'node_modules' ]
     },
     plugins: [
