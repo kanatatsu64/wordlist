@@ -28,7 +28,4 @@ install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
 script:
-- echo "start script"
-- ./scripts/runTest.py > ../log
-- echo "$(pwd)"
-- echo $(pwd)
+- ./scripts/runTest.py 2>&1
