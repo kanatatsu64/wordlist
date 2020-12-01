@@ -47,4 +47,8 @@ if __name__ == "__main__":
         scripts = helper.getAllScripts(config)
     else:
         scripts = helper.getScripts(config, files)
-    helper.execScripts(scripts)
+    res = helper.execScripts(scripts)
+    if res:
+        exit(0)
+    else:
+        exit(1)

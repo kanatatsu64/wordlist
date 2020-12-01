@@ -105,20 +105,30 @@ def getAllScripts(config):
         pairs.append([name, script])
     return buildScript(pairs)
 
-def execCmd(cmd):
+def execCmd(cmd, check=False):
     log(cmd)
     try:
         ret = subprocess.run(cmd, shell=True, check=True)
         out = ret.stdout.decode('utf-8')
         err = ret.stderr.decode('utf-8')
     except Exception as e:
-        log("failed: "+str(cmd))
-        log(e)
-        return ''
+        if check:
+            raise e
+        else:
+            log("failed: "+str(cmd))
+            log(e)
+            return ''
     log(out)
     log(err)
     return out 
 
 def execScripts(scripts):
+    result = True
     for script in scripts:
-        execCmd(script)
+        try:
+            execCmd(script, check=True)
+        except Exception as e:
+            log("failed: "+str(script))
+            log(e)
+            result = False
+    return result
