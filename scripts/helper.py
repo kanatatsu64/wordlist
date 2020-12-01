@@ -2,6 +2,7 @@ import sys
 import re
 import yaml
 import subprocess
+from logger import log
 
 def load(path):
     config = loadFile(path)
@@ -104,6 +105,20 @@ def getAllScripts(config):
         pairs.append([name, script])
     return buildScript(pairs)
 
+def execCmd(cmd):
+    log(cmd)
+    try:
+        ret = subprocess.run(cmd, shell=True, check=True)
+        out = ret.stdout.decode('utf-8')
+        err = ret.stderr.decode('utf-8')
+    except Exception as e:
+        log("failed: "+str(cmd))
+        log(e)
+        return ''
+    log(out)
+    log(err)
+    return out 
+
 def execScripts(scripts):
     for script in scripts:
-        subprocess.check_call(script, shell=True)
+        execCmd(script)

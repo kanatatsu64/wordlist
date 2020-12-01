@@ -1,5 +1,6 @@
 import subprocess
 from logger import log
+from helper import execCmd
 
 # Implemented based on
 # https://dev.to/ahferroin7/skip-ci-stages-in-travis-based-on-what-files-changed-3a4k
@@ -29,16 +30,6 @@ def getFiles(env):
                 return getWhenPushExisting(env)
             else:
                 return None
-
-def execCmd(cmd):
-    log(cmd)
-    try:
-        out = subprocess.check_output(cmd, shell=True).decode('utf-8')
-    except Exception as e:
-        log("failed: "+str(cmd))
-        log(e)
-        return ''
-    return out 
 
 def execGitDiff(cmd):
     out = execCmd(cmd)
