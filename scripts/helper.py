@@ -4,10 +4,13 @@ import yaml
 import subprocess
 from logger import log
 
+def unused(var):
+    pass
+
 def load(path):
     config = loadFile(path)
     if not validate(config):
-        print('invalid config file', file=sys.stderr)
+        log('invalid config file')
         exit(1)
     return convert(config)
 
@@ -135,7 +138,7 @@ def execCmd(cmd, check=False):
             log(e)
             return ''
     log(out)
-    log(err)
+    unused(err)
     return out 
 
 def execScripts(scripts):

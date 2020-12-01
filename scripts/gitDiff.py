@@ -33,7 +33,7 @@ def getFiles(env):
 
 def execGitDiff(cmd):
     out = execCmd(cmd)
-    return filter(None, out.split('\n'))
+    return list(filter(None, out.split('\n')))
 
 def parseRange(commitRange):
     return commitRange.split('...')
@@ -48,11 +48,6 @@ def historyExists(env):
     def exists(commit):
         cmd = "git cat-file -t "+str(commit)
         out = execCmd(cmd).split('\n')[0]
-        print("debug@history")
-        print(out)
-        print("debug@history")
-        print(out == 'commit')
-        print("debug@history")
         return (out == 'commit')
     commit1, commit2 = parseRange(env.commitRange)
     return (exists(commit1) and exists(commit2))
