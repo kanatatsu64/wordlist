@@ -28,5 +28,6 @@ install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
 script:
+- echo "start script"
 - ./scripts/runTest.py > ../log
 - echo "$(cat ../log)"
