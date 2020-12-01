@@ -30,4 +30,5 @@ install:
 script:
 - echo "start script"
 - ./scripts/runTest.py > ../log
-- echo "$(cat ../log)"
+- echo "$(pwd)"
+- echo $(pwd)
