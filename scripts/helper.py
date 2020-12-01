@@ -78,7 +78,7 @@ def convert(config):
     return list(map(convertSection, sections))
 
 def notice(name):
-    return "echo 'start "+str(name)+" script' &&"
+    return "echo 'start "+str(name)+" script';"
 
 def buildScript(pairs):
     uniqs = {}
@@ -137,8 +137,10 @@ def execCmd(cmd, check=False):
             log("failed: "+str(cmd))
             log(e)
             return ''
-    log(out)
-    unused(err)
+    if out:
+        log(out)
+    if err:
+        log(err)
     return out 
 
 def execScripts(scripts):
