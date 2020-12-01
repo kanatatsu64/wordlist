@@ -17,7 +17,7 @@ addons:
       - git
 
 git:
-  depth: false
+  depth: 50
 
 before_install:
 - mkdir -p ~/.local/bin
@@ -29,4 +29,5 @@ install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
 script:
+- git log
 - ./scripts/runTest.py
