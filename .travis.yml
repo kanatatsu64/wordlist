@@ -28,4 +28,4 @@ install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
 script:
-- ./scripts/runTest.py 2>&1
+- ./scripts/runTest.py
