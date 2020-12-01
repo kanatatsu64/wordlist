@@ -1,0 +1,14 @@
+{
+  frontend: {
+    test: /wordlist/client//,
+    script: echo 'not implemented' >&2
+  },
+  backend: {
+    test: /wordlist/src//,
+    script: stack --no-terminal test --haddock --no-haddock-deps
+  },
+  build: {
+    test: /wordlist/scripts//,
+    script: python3 scripts/test-helper.py
+  }
+}
