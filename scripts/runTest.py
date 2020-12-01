@@ -24,7 +24,7 @@ class EnvClass:
         self.tag = None
         self.stage = None
 
-if __name__ == "main":
+if __name__ == "__main__":
     print("start runTest", file=sys.stdout)
     Env = EnvClass()
     Env.commit = os.environ['TRAVIS_COMMIT']
