@@ -78,7 +78,7 @@ def convert(config):
     return list(map(convertSection, sections))
 
 def notice(name):
-    return "echo 'start "+str(name)+" script';"
+    return "echo 'start "+str(name)+" script'; "
 
 def buildScript(pairs):
     uniqs = {}
