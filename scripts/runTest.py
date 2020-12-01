@@ -24,6 +24,7 @@ class EnvClass:
         self.stage = None
 
 if __name__ == "main":
+    print("start runTest")
     Env = EnvClass()
     Env.commit = os.environ['TRAVIS_COMMIT']
     Env.commitRange = os.environ['TRAVIS_COMMIT_RANGE']
