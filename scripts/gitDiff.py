@@ -47,7 +47,7 @@ def isNewBranch(env):
 def historyExists(env):
     def exists(commit):
         cmd = "git cat-file -t "+str(commit)
-        out = execCmd(cmd)
+        out = execCmd(cmd).split('\n')[0]
         print("debug@history")
         print(out)
         print("debug@history")
