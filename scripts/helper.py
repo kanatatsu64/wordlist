@@ -70,7 +70,7 @@ def convert(config):
     return list(map(convertSection, config.items()))
 
 def notice(name):
-    return "echo 'start "+str(name)+" script' >&2;"
+    return "echo 'start "+str(name)+" script'; "
 
 def buildScript(pairs):
     uniqs = {}
