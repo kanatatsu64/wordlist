@@ -25,6 +25,7 @@ Env.stage = os.environ['TRAVIS_BUILD_STAGE_NAME']
 if __name__ == "main":
     config = helper.load(ConfigFile)
     files = gitDiff.getFiles(Env)
+    print(f"changed files: {files}")
     scripts = []
     if files == None:
         scripts = helper.getAllScripts(config)
