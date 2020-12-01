@@ -113,8 +113,14 @@ def execCmd(cmd, check=False):
     log(cmd)
     try:
         ret = subprocess.run(cmd, shell=True, check=True)
-        out = ret.stdout.decode('utf-8')
-        err = ret.stderr.decode('utf-8')
+        if ret.stdout:
+            out = ret.stdout.decode('utf-8')
+        else:
+            out = ""
+        if ret.stderr:
+            err = ret.stderr.decode('utf-8')
+        else:
+            err = "" 
     except Exception as e:
         if check:
             raise e
