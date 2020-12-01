@@ -106,4 +106,4 @@ def getAllScripts(config):
 
 def execScripts(scripts):
     for script in scripts:
-        subprocess.check_call(script)
+        subprocess.check_call(script, shell=True)

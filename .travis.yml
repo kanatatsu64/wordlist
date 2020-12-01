@@ -14,7 +14,6 @@ addons:
     packages:
       - libgmp-dev
       - python3
-      - git
 
 git:
   depth: 50

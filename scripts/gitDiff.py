@@ -33,7 +33,7 @@ def getFiles(env):
 def execCmd(cmd):
     log(cmd)
     try:
-        out = subprocess.check_output(cmd).decode('utf-8')
+        out = subprocess.check_output(cmd, shell=True).decode('utf-8')
     except Exception as e:
         log("failed: "+str(cmd))
         log(e)
