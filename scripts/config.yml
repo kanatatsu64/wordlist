@@ -5,7 +5,7 @@
   },
   backend: {
     test: /wordlist/src//,
-    script: stack --no-terminal test --haddock --no-haddock-deps
+    script: stack --no-terminal test
   },
   build: {
     test: /wordlist/scripts//,
