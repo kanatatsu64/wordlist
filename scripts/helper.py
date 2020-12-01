@@ -4,9 +4,6 @@ import yaml
 import subprocess
 from logger import log
 
-def unused(var):
-    pass
-
 def load(path):
     config = loadFile(path)
     if not validate(config):
