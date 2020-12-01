@@ -13,8 +13,18 @@ import gitDiff
 
 ConfigFile = "scripts/config.yml"
 
+class EnvClass:
+    def __init__(self):
+        self.commit = None
+        self.commitRange = None
+        self.branch = None
+        self.pullRequest = None
+        self.pullRequestBranch = None
+        self.tag = None
+        self.stage = None
+
 if __name__ == "main":
-    Env = object()
+    Env = EnvClass()
     Env.commit = os.environ['TRAVIS_COMMIT']
     Env.commitRange = os.environ['TRAVIS_COMMIT_RANGE']
     Env.branch = os.environ['TRAVIS_BRANCH']
