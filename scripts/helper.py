@@ -112,7 +112,9 @@ def getAllScripts(config):
 def execCmd(cmd, check=False):
     log(cmd)
     try:
+        print("debug@helper")
         ret = subprocess.run(cmd, shell=True, check=True)
+        print("debug@helper")
         if ret.stdout:
             out = ret.stdout.decode('utf-8')
         else:
@@ -121,6 +123,9 @@ def execCmd(cmd, check=False):
             err = ret.stderr.decode('utf-8')
         else:
             err = "" 
+        print("debug@helper")
+        print(out)
+        print("debug@helper")
     except Exception as e:
         if check:
             raise e
@@ -130,11 +135,6 @@ def execCmd(cmd, check=False):
             return ''
     log(out)
     log(err)
-    print("debug@helper")
-    print(out)
-    print("debug@helper")
-    print(err)
-    print("debug@helper")
     return out 
 
 def execScripts(scripts):

@@ -28,5 +28,4 @@ install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
 script:
-- git log
 - ./scripts/runTest.py
