@@ -29,4 +29,4 @@ install:
 
 script:
 - ./scripts/runTest.py > ../log
-- cat ../log
+- echo "$(cat ../log)"
