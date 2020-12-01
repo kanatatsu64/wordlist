@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import helper
 import gitDiff
 
@@ -24,7 +25,7 @@ class EnvClass:
         self.stage = None
 
 if __name__ == "main":
-    print("start runTest")
+    print("start runTest", file=sys.stdout)
     Env = EnvClass()
     Env.commit = os.environ['TRAVIS_COMMIT']
     Env.commitRange = os.environ['TRAVIS_COMMIT_RANGE']
@@ -36,7 +37,7 @@ if __name__ == "main":
 
     config = helper.load(ConfigFile)
     files = gitDiff.getFiles(Env)
-    print("changed files: "+str(files))
+    print("changed files: "+str(files), file=sys.stdout)
     scripts = []
     if files == None:
         scripts = helper.getAllScripts(config)
