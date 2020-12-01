@@ -48,10 +48,11 @@ def historyExists(env):
     def exists(commit):
         cmd = "git cat-file -t "+str(commit)
         out = execCmd(cmd)
-        print("debug")
+        print("debug@history")
         print(out)
-        print(type(out))
+        print("debug@history")
         print(out == 'commit')
+        print("debug@history")
         return (out == 'commit')
     commit1, commit2 = parseRange(env.commitRange)
     return (exists(commit1) and exists(commit2))

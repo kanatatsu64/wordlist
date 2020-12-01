@@ -130,6 +130,11 @@ def execCmd(cmd, check=False):
             return ''
     log(out)
     log(err)
+    print("debug@helper")
+    print(out)
+    print("debug@helper")
+    print(err)
+    print("debug@helper")
     return out 
 
 def execScripts(scripts):
