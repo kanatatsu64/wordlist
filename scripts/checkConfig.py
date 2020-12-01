@@ -3,6 +3,9 @@
 from runTest import ConfigFile
 import helper
 
-if __name__ == "main":
+if __name__ == "__main__":
     config = helper.loadFile(ConfigFile)
-    helper.validate(config)
+    if helper.validate(config):
+        print("no problem is found")
+    else:
+        print("config file is invalid")

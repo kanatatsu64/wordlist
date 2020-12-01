@@ -13,16 +13,16 @@ import gitDiff
 
 ConfigFile = "scripts/config.yml"
 
-Env = object()
-Env.commit = os.environ['TRAVIS_COMMIT']
-Env.commitRange = os.environ['TRAVIS_COMMIT_RANGE']
-Env.branch = os.environ['TRAVIS_BRANCH']
-Env.pullRequest = os.environ['TRAVIS_PULL_REQUEST']
-Env.pullRequestBranch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
-Env.tag = os.environ['TRAVIS_TAG']
-Env.stage = os.environ['TRAVIS_BUILD_STAGE_NAME']
-
 if __name__ == "main":
+    Env = object()
+    Env.commit = os.environ['TRAVIS_COMMIT']
+    Env.commitRange = os.environ['TRAVIS_COMMIT_RANGE']
+    Env.branch = os.environ['TRAVIS_BRANCH']
+    Env.pullRequest = os.environ['TRAVIS_PULL_REQUEST']
+    Env.pullRequestBranch = os.environ['TRAVIS_PULL_REQUEST_BRANCH']
+    Env.tag = os.environ['TRAVIS_TAG']
+    Env.stage = os.environ['TRAVIS_BUILD_STAGE_NAME']
+
     config = helper.load(ConfigFile)
     files = gitDiff.getFiles(Env)
     print("changed files: "+str(files))
