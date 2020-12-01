@@ -13,6 +13,7 @@ addons:
   apt:
     packages:
       - libgmp-dev
+      - python3
 
 git:
   depth: false
@@ -21,9 +22,8 @@ before_install:
 - mkdir -p ~/.local/bin
 - export PATH=$HOME/.local/bin:$PATH
 - travis_retry curl -L https://get.haskellstack.org/stable/linux-x86_64.tar.gz | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
-- chmod ugo+x scripts/run-tests.sh
 
 install:
 - stack --no-terminal --install-ghc test --only-dependencies
 
-script: ./scripts/run-tests.sh
+script: python3 scripts/runTest.py
