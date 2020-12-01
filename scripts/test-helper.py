@@ -210,15 +210,15 @@ class TestConvert(unittest.TestCase):
             actual = rec.keys()
             self.assertCountEqual(expected, actual)
 
-            expected = f"example{i+1}"
+            expected = "example"+str(i+1)
             actual = rec['name']
             self.assertCountEqual(expected, actual)
 
-            expected = re.compile(f"^src{i+1}/")
+            expected = re.compile("^src"+str(i+1)+"/")
             actual = rec['test']
             self.assertEqual(expected, actual)
 
-            expected = f"stack test {i+1}"
+            expected = "stack test "+str(i+1)
             actual = rec['script']
             self.assertEqual(expected, actual)
 

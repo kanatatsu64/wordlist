@@ -45,7 +45,7 @@ def isNewBranch(env):
 
 def historyExists(env):
     def exists(commit):
-        cmd = f"git cat-file -t ${commit}"
+        cmd = "git cat-file -t "+str(commit)
         out = subprocess.check_output(cmd).decode('utf-8')
         return (out == 'commit')
     commit1, commit2 = parseRange(env.commitRange)
@@ -58,9 +58,9 @@ def getWhenPushExisting(env):
     return getByRange(env.commitRange)
 
 def getDiff(origin, target):
-    cmd = f"git diff --name-only {origin}...{target}"
+    cmd = "git diff --name-only "+str(origin)+"..."+str(target)
     return execGitDiff(cmd)
 
 def getByRange(commitRange):
-    cmd = f"git diff --name-only {commitRange}"
+    cmd = "git diff --name-only "+str(commitRange)
     return execGitDiff(cmd)
