@@ -1,14 +1,14 @@
 {
   frontend: {
-    test: /wordlist/client//,
+    test: /^client//,
     script: echo 'not implemented' >&2
   },
   backend: {
-    test: /wordlist/src//,
+    test: /^src//,
     script: stack --no-terminal test
   },
   build: {
-    test: /wordlist/scripts//,
+    test: /^scripts//,
     script: python3 scripts/test-helper.py
   }
 }
