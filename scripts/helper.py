@@ -68,7 +68,11 @@ def convert(config):
             'test': compileRegexpr(test),
             'script': script
         }
-    return list(map(convertSection, config.items()))
+    def fst(section):
+        return section[0]
+
+    sections = sorted(config.items(), key=fst)
+    return list(map(convertSection, sections))
 
 def notice(name):
     return "echo 'start "+str(name)+" script'; "
