@@ -34,8 +34,9 @@ def execCmd(cmd):
     log(cmd)
     try:
         out = subprocess.check_output(cmd).decode('utf-8')
-    except:
+    except Exception as e:
         log("failed: "+str(cmd))
+        log(e)
         return ''
     return out 
 
