@@ -9,6 +9,6 @@
   },
   build: {
     test: /^scripts//,
-    script: python3 scripts/test-helper.py
+    script: ./scripts/test-helper.py
   }
 }
