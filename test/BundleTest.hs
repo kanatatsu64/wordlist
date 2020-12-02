@@ -1,5 +1,4 @@
 {-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE ScopedTypeVariables #-}
 
 module BundleTest (
     test_all,
@@ -11,7 +10,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Html ( Htmlizable (..), export )
-import TestUtils ( CardMock (..) )
+import TestUtils ( getCardMock )
 import Bundle ( Bundle (..) )
 
 test_all = testGroup "Bundle" [
@@ -24,22 +23,22 @@ test_toHtml = testGroup "toHtml" [
     ]
     where
         test_toHtml1 = testCase "toHtml 1" do
-            let card = CardMock "card mock"
+            card <- getCardMock "card mock"
             let bundle = Bundle "german" "" [card]
-            let expected = "<table>" ++
+                expected = "<table>" ++
                                "<caption>german</caption>" ++
                                (export . toHtml) card ++
                            "</table>"
-            let actual = export $ toHtml bundle
+                actual = export $ toHtml bundle
             assertEqual "toHtml simple bundle" expected actual
         test_toHtml2 = testCase "toHtml 2" do
-            let card1 = CardMock "card mock 1"
-            let card2 = CardMock "card mock 2"
+            card1 <- getCardMock "card mock 1"
+            card2 <- getCardMock "card mock 2"
             let bundle = Bundle "german" "from textbook" [card1, card2]
-            let expected = "<table>" ++
+                expected = "<table>" ++
                                "<caption>german (from textbook)</caption>" ++
                                (export . toHtml) card1 ++
                                (export . toHtml) card2 ++
                            "</table>"
-            let actual = export $ toHtml bundle
+                actual = export $ toHtml bundle
             assertEqual "toHtml complex bundle with a description" expected actual

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e366da29a24f3bd696ef41a9b79b1ced8db4f0bbbe7ff157cd54c4af764e2479
+-- hash: bc61cc916f29204e515c7b54dfe27f9fae9c68546e90e5fd60738a789671dfbb
 
 name:           wordlist
 version:        0.1.0.0
@@ -112,13 +112,12 @@ test-suite wordlist-test
       BundleTest
       CsvTest
       DirectoryTest
-      German.AdjectiveTest
-      German.AdverbTest
-      German.ConjunctionTest
-      German.NounTest
-      German.Spec
-      German.VerbTest
       HtmlTest
+      Plugins.German.AdjectiveTest
+      Plugins.German.NounTest
+      Plugins.German.Spec
+      Plugins.German.VerbTest
+      Plugins.Spec
       TestUtils
       UtilsTest
       Paths_wordlist

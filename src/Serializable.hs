@@ -6,6 +6,8 @@ module Serializable (
     Serializable (..)
 ) where
 
+import UUID ( UUID, toString )
+
 data Serial = forall a. Serializable a => Serial a
 
 class Serializable a where
@@ -13,3 +15,9 @@ class Serializable a where
 
 instance Serializable String where
     serialize = id
+
+instance Serializable UUID where
+    serialize = toString
+
+instance Serializable Serial where
+    serialize (Serial s) = serialize s
