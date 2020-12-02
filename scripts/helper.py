@@ -109,24 +109,19 @@ def getAllScripts(config):
         pairs.append([name, script])
     return buildScript(pairs)
 
-def execCmd(cmd, check=False):
+def execCmdOut(cmd, check=False):
     log(cmd)
     try:
         opts = {
             'shell': True,
             'check': True,
-            'stdout': subprocess.PIPE,
-            'stderr': subprocess.PIPE
+            'stdout': subprocess.PIPE
         }
         ret = subprocess.run(cmd, **opts)
         if ret.stdout:
             out = ret.stdout.decode('utf-8')
         else:
             out = ""
-        if ret.stderr:
-            err = ret.stderr.decode('utf-8')
-        else:
-            err = "" 
     except Exception as e:
         if check:
             raise e
@@ -136,9 +131,23 @@ def execCmd(cmd, check=False):
             return ''
     if out:
         log(out)
-    if err:
-        log(err)
     return out 
+
+def execCmd(cmd, check=False):
+    log(cmd)
+    try:
+        opts = {
+            'shell': True,
+            'check': True
+        }
+        subprocess.run(cmd, **opts)
+    except Exception as e:
+        if check:
+            raise e
+        else:
+            log("failed: "+str(cmd))
+            log(e)
+            return ''
 
 def execScripts(scripts):
     result = True

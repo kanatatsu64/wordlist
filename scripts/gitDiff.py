@@ -1,6 +1,6 @@
 import subprocess
 from logger import log
-from helper import execCmd
+from helper import execCmdOut
 
 # Implemented based on
 # https://dev.to/ahferroin7/skip-ci-stages-in-travis-based-on-what-files-changed-3a4k
@@ -32,7 +32,7 @@ def getFiles(env):
                 return None
 
 def execGitDiff(cmd):
-    out = execCmd(cmd)
+    out = execCmdOut(cmd)
     return list(filter(None, out.split('\n')))
 
 def parseRange(commitRange):
@@ -47,7 +47,7 @@ def isNewBranch(env):
 def historyExists(env):
     def exists(commit):
         cmd = "git cat-file -t "+str(commit)
-        out = execCmd(cmd).split('\n')[0]
+        out = execCmdOut(cmd).split('\n')[0]
         return (out == 'commit')
     commit1, commit2 = parseRange(env.commitRange)
     return (exists(commit1) and exists(commit2))
