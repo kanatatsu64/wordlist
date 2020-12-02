@@ -3,12 +3,12 @@
 module Bundle ( Bundle (..) ) where
 
 import Html ( Htmlizable (..), TagName (..), Html (..), Content (..) )
-import CardClass ( Card )
+import Card ( Card )
 
-data Bundle = forall c. (Card c, Htmlizable c) => Bundle {
+data Bundle = Bundle {
     name :: String,
     desc :: String,
-    cards :: [c]
+    cards :: [Card]
 }
 
 {-

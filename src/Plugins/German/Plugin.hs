@@ -1,23 +1,34 @@
-module German.Proc ( 
-    toCard,
-    toHtml
+module Plugins.German.Plugin ( 
+    uuid,
+    getPlugin
 ) where
 
-import qualified CardClass ( Card (..) )
-import CardClass ( Language ( German ) )
+import UUID ( UUID, fromString )
+import Card ( Card, CardID )
+import Plugin ( Plugin (..) )
+import Plugins.German.Card ( GermanCard (..), Part (..), convertCard )
 
-import German.Card ( Card (..), Part (..) )
-import Html ( Htmlizable (..), Html (..) )
+import qualified Plugins.German.Noun as Noun ( parse )
+import qualified Plugins.German.Verb as Verb( parse )
+import qualified Plugins.German.Adjective as Adjective ( parse )
+import qualified Plugins.German.Adverb as Adverb ( parse )
+import qualified Plugins.German.Conjunction as Conjunction ( parse )
 
-import qualified German.Noun as Noun ( parse, toHtml )
-import qualified German.Verb as Verb( parse, toHtml )
-import qualified German.Adjective as Adjective ( parse, toHtml )
-import qualified German.Adverb as Adverb ( parse, toHtml )
-import qualified German.Conjunction as Conjunction ( parse, toHtml )
+uuid :: MonadFail m => m UUID
+uuid = fromString "c2cc10e1-57d6-4b6f-9899-38d972112d8c"
 
-toCard :: [String] -> Card
-toCard vals = parsePart vals (Card cardid)
-    where cardid = "not implemented"
+getPlugin :: MonadFail m => m Plugin
+getPlugin = do
+    _uuid <- uuid
+    return $ Plugin _uuid _toCard _fromCard
+
+_toCard :: CardID -> [String] -> Maybe Card
+_toCard _cardid vals = do
+    german <- parsePart vals (GermanCard _cardid)
+    return $ convertCard german
+
+_fromCard :: Card -> [String]
+_fromCard = undefined
 
 isNoun :: String -> Bool
 isNoun "N" = True
@@ -96,21 +107,3 @@ parsePart (part:rests) cons
     | isAdjective part = Adjective.parse rests (cons Adjective)
     | isAdverb part = Adverb.parse rests (cons Adverb)
     | isConjunction part = Conjunction.parse rests (cons Conjunction)
-
-_toHtml :: Card -> Html
-_toHtml card = case part card of
-    Noun -> Noun.toHtml card
-    Verb -> Verb.toHtml card
-    Adjective -> Adjective.toHtml card
-    Adverb -> Adverb.toHtml card
-    Conjunction -> Conjunction.toHtml card
-
-instance CardClass.Card Card where
-    cardid = cardid
-    language = const German
-    word = word
-    meaning = meaning
-    toCard = toCard
-
-instance Htmlizable Card where
-    toHtml = _toHtml

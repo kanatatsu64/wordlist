@@ -1,4 +1,3 @@
-{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Server.Api.Csv.Router (
@@ -7,15 +6,15 @@ module Server.Api.Csv.Router (
 
 import Prelude hiding ( lookup )
 
-import CardClass ( fromCsv )
+import Csv ( loadCsv )
 import Directory ( doesFileExist )
-import qualified German.Base as German ( Card )
+import qualified Plugins.German.Base as German ( getPlugin )
 import Server.Json ( Json (..) )
 import Server.Response ( json, notFound )
 import Server.Handler ( handler )
 import Server.Types ( lookup, decode )
 import Server.Internal.Router ( get, (~>) )
-import Server.Api.Csv.Types ( Csv (..), convertCard, replaceId )
+import Server.Api.Csv.Types ( Csv (..), convertCard )
 
 import qualified Server.Api.Csv.List as List ( getCSVHandler, getNameHandler )
 
@@ -33,8 +32,9 @@ getHandler = handler $ \params -> do
             exist <- doesFileExist path
             if exist
             then do
-                _cards <- fromCsv @German.Card path
-                cards <- mapM (replaceId . convertCard) _cards
+                plugin <- German.getPlugin
+                _cards <- loadCsv plugin path
+                let cards = map convertCard _cards
                 let csv = Csv name cards
                 json $ jsonify csv
             else notFound

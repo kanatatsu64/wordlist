@@ -1,6 +1,5 @@
-module German.Verb (
+module Plugins.German.Verb (
     parse,
-    toHtml,
     
     Kind (..),
     isIntransitive,
@@ -8,12 +7,8 @@ module German.Verb (
     parseAttrs
 ) where
 
-import Prelude hiding ( word )
-
-import Serializable ( Serializable (..) )
-import Html ( Html (..), TagName (..), Content (..) )
-import German.Card ( Card (..), Attr (..) )
-import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
+import Serializable ( Serializable (..), Serial (..) )
+import Plugins.German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
 
 data Kind = Intransitive | Transitive
 
@@ -57,28 +52,13 @@ parseAttrs vals@(kind:_)
     | isIntransitive kind = parseKindI vals
     | isTransitive kind = (parseKindT >:> parseForm) vals
 
-parseKindT (_:rests) cons next = next rests (_cons Transitive)
-    where _cons kind form = cons [Attr kind, Attr form]
+parseKindT (_:rests) cons = Just $ \next -> next rests (_cons Transitive)
+    where _cons kind form = cons [Serial kind, Serial form]
+parseKindT _ _ = Nothing
 
-parseKindI (_:_:rests) cons next = next rests (_cons Intransitive)
-    where _cons kind = cons [Attr kind]
+parseKindI (_:_:rests) cons = Just $ \next -> next rests (_cons Intransitive)
+    where _cons kind = cons [Serial kind]
+parseKindI _ _ = Nothing
 
-parseForm (form:rests) cons next = next rests (cons form)
-
-{-
-    Card German Verb haben [Transitive, - (4)] have illegal [Ich habe eine Haus., I have a hous.]
-
-    <tr>
-        <td> haben </td>
-        <td> T. have (illegal) </td> <--! dismiss form -->
-        <--! dismiss examples -->
-    </tr>
--}
-
-toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
-    where firstTd card = Tag TD [] [Text $ word card]
-          secondTd card = Tag TD [] [Text $ serialize kind ++ " " ++ meaning card ++ _note]
-          (kind:_) = attrs card
-          _note = case note card of
-            "" -> ""
-            _ -> " (" ++ note card ++ ")"
+parseForm (form:rests) cons = Just $ \next -> next rests (cons form)
+parseForm _ _ = Nothing

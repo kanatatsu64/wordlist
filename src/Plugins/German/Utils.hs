@@ -1,4 +1,4 @@
-module German.Utils (
+module Plugins.German.Utils (
     parse,
     parseWord,
     parseAttrs,
@@ -10,10 +10,13 @@ module German.Utils (
     defaultParse
 ) where
 
-import German.Card ( Example (..) )
+import Plugins.German.Card ( Example (..) )
+import Control.Monad
+import Utils
 
-defaultParse :: [a] -> (a -> f) -> ([a] -> f -> t) -> t
-defaultParse (val:rests) cons next = next rests (cons val)
+defaultParse :: [a] -> (a -> f) -> Maybe (([a] -> f -> t) -> t)
+defaultParse (val:rests) cons = Just $ \next -> next rests (cons val)
+defaultParse _ _ = Nothing
 
 parse = parseWord >:>
         parseAttrs >:>
@@ -23,15 +26,21 @@ parse = parseWord >:>
 
 parseWord = defaultParse
 
-parseAttrs (_:_:rests) cons next = next rests (cons [])
+parseAttrs (_:_:rests) cons = Just $ \next -> next rests (cons [])
+parseAttrs _ _ = Nothing
 
 parseMeaning = defaultParse
 
 parseNote = defaultParse
 
-parseExamples vals cons = cons (loop vals)
-    where loop (original:translation:rests) = Example original translation:loop rests
-          loop [] = []
+parseExamples vals cons = do
+        examples <- loop vals
+        return $ cons examples
+    where loop (original:translation:rests) = do
+              examples <- loop rests
+              return $ Example original translation:examples
+          loop [] = return []
+          loop _ = Nothing
 
-(>:>) :: (a -> b -> (c -> d -> e) -> e) -> (c -> d -> e) -> (a -> b -> e)
-f >:> g = \a b -> f a b g
+(>:>) :: Monad m => (a -> b -> m (c -> m d)) -> c -> (a -> b -> m d)
+f >:> g = \a b -> join $ f a b <@> g

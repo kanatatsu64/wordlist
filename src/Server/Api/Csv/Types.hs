@@ -3,17 +3,15 @@ module Server.Api.Csv.Types (
     Card (..),
     Csv (..),
     convertLanguage,
-    convertCard,
-    replaceId
+    convertCard
 ) where
 
 import Prelude hiding ( Word )
 
-import qualified Data.UUID as UUID ( toString )
-import qualified Data.UUID.V4 as UUID ( nextRandom )
+import qualified UUID ( toString )
 
 import Server.Json ( Json (..), Ary (..), Dict (..), Rec (..) )
-import qualified CardClass ( Language (..), Card (..) )
+import qualified Card ( Language (..), Card (..) )
 
 data Language = Japanese | English | Chinese | French | German
 
@@ -39,19 +37,19 @@ instance Json Card where
             Rec "meaning" meaning
         ]
 
-convertLanguage :: CardClass.Language -> Language
-convertLanguage CardClass.Japanese = Japanese
-convertLanguage CardClass.English = English
-convertLanguage CardClass.Chinese =Chinese
-convertLanguage CardClass.French = French
-convertLanguage CardClass.German = German
+convertLanguage :: Card.Language -> Language
+convertLanguage Card.Japanese = Japanese
+convertLanguage Card.English = English
+convertLanguage Card.Chinese =Chinese
+convertLanguage Card.French = French
+convertLanguage Card.German = German
 
-convertCard :: CardClass.Card a => a -> Card
+convertCard :: Card.Card -> Card
 convertCard card = Card cardid language word meaning
-    where cardid = CardClass.cardid card
-          language = convertLanguage $ CardClass.language card
-          word = CardClass.word card
-          meaning = CardClass.meaning card
+    where cardid = UUID.toString $ Card.cardid card
+          language = convertLanguage $ Card.language card
+          word = Card.word card
+          meaning = Card.meaning card
 
 data Csv = Csv {
     name :: String,
@@ -63,8 +61,3 @@ instance Json Csv where
             Rec "name" name,
             Rec "cards" (Ary cards)
         ]
-
-replaceId :: Card -> IO Card
-replaceId card = do
-    uuid <- UUID.nextRandom
-    return $ card { cardid = UUID.toString uuid }

@@ -3,7 +3,10 @@ module Utils (
     cont,
     execContT,
     execCont,
-    split
+    split,
+    maybeToFail,
+    for,
+    (<@>)
 ) where
 
 import System.IO
@@ -38,3 +41,15 @@ split delim str = reverse $ execState (loop str) [""]
                       let c' = c ++ [x]
                       put (c':cs)
                   [] -> put [[x]]
+
+maybeToFail :: MonadFail m => String -> Maybe a -> m a
+maybeToFail _ (Just x) = return x
+maybeToFail msg Nothing = fail msg
+
+for :: [a] -> (a -> b) -> [b]
+for = flip map
+
+infixl 4 <@>
+
+(<@>) :: Applicative f => f (a -> b) -> a -> f b
+(<@>) h x = ($ x) <$> h

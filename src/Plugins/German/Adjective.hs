@@ -1,18 +1,13 @@
-module German.Adjective (
+module Plugins.German.Adjective (
     parse,
-    toHtml,
 
     Comparative (..),
     Superlative (..),
     parseAttrs
 ) where
 
-import Prelude hiding ( word )
-
-import Serializable ( Serializable (..) )
-import Html ( Html (..), TagName (..), Content (..) )
-import German.Card ( Card (..), Attr (..) )
-import German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
+import Serializable ( Serializable (..), Serial (..) )
+import Plugins.German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
 
 newtype Comparative = Comparative String
 
@@ -32,25 +27,9 @@ parse = parseWord >:>
 
 parseAttrs = parseComparative >:> parseSuperlative
 
-parseComparative (comp:rests) cons next = next rests (_cons (Comparative comp))
-    where _cons comp sup = cons [Attr comp, Attr sup]
+parseComparative (comp:rests) cons = Just $ \next -> next rests (_cons (Comparative comp))
+    where _cons comp sup = cons [Serial comp, Serial sup]
+parseComparative _ _ = Nothing
 
-parseSuperlative (sup:rests) cons next = next rests (cons (Superlative sup))
-
-{-
-    Card German Adjective klein [-er, -est] small _ [ein kleines Kind, a small child]
-
-    <tr>
-        <td> klein </td>
-        <td> Adj. small </td> <--! dismiss comparative & superlative -->
-        <--! dismiss examples -->
-    </tr>
--}
-
-toHtml card = Tag TR [] [Child $ firstTd card, Child $ secondTd card]
-    where firstTd card = Tag TD [] [Text $ word card]
-          secondTd card = Tag TD [] [Text $ serialize (part card) ++ " " ++ meaning card ++ _note]
-          _note = case note card of
-            "" -> ""
-            _ -> " (" ++ note card ++ ")"
-
+parseSuperlative (sup:rests) cons = Just $ \next -> next rests (cons (Superlative sup))
+parseSuperlative _ _ = Nothing

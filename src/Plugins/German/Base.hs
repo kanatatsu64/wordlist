@@ -1,11 +1,14 @@
-module German.Base (
-    Card (..),
+module Plugins.German.Base (
+    uuid,
+    getPlugin,
+    GermanCard (..),
     Part (..),
     Genre (..),
     Kind (..) 
 ) where
 
-import German.Proc ()
-import German.Card ( Card (..), Part (..) )
-import German.Noun ( Genre (..) )
-import German.Verb ( Kind (..) )
+import Plugin ()
+import Plugins.German.Plugin ( getPlugin, uuid )
+import Plugins.German.Card ( GermanCard (..), Part (..) )
+import Plugins.German.Noun ( Genre (..) )
+import Plugins.German.Verb ( Kind (..) )

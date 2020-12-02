@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1a49ca6cf4e307109ae2de1de386d5b31329edfbe2566f6ef66792b96d119cc2
+-- hash: e366da29a24f3bd696ef41a9b79b1ced8db4f0bbbe7ff157cd54c4af764e2479
 
 name:           wordlist
 version:        0.1.0.0
@@ -28,21 +28,23 @@ source-repository head
 library
   exposed-modules:
       Bundle
-      CardClass
+      Card
       Csv
       Directory
       Examples.CsvToHtml
       Examples.ServerResponse
-      German.Adjective
-      German.Adverb
-      German.Base
-      German.Card
-      German.Conjunction
-      German.Noun
-      German.Proc
-      German.Utils
-      German.Verb
       Html
+      Plugin
+      Plugins.Base
+      Plugins.German.Adjective
+      Plugins.German.Adverb
+      Plugins.German.Base
+      Plugins.German.Card
+      Plugins.German.Conjunction
+      Plugins.German.Noun
+      Plugins.German.Plugin
+      Plugins.German.Utils
+      Plugins.German.Verb
       Serializable
       Server.Api.Csv.List
       Server.Api.Csv.Router
@@ -62,6 +64,7 @@ library
       Server.Router
       Server.Types
       Utils
+      UUID
   other-modules:
       Paths_wordlist
   hs-source-dirs:
