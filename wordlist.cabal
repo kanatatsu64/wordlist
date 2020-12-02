@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f497e5ee84afda3d1c2e990464d699279dd8a82c599511248183e494afadd580
+-- hash: b727893b39b77df38ff04823b5bcdfe07b747f93864ccdbc422a385076fb8ffb
 
 name:           wordlist
 version:        0.1.0.0
@@ -68,7 +68,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      HDBC
+    , base >=4.7 && <5
     , bytestring
     , directory
     , http-types
@@ -89,7 +90,8 @@ executable wordlist-exe
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HDBC
+    , base >=4.7 && <5
     , bytestring
     , directory
     , http-types
@@ -123,7 +125,8 @@ test-suite wordlist-test
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      HDBC
+    , base >=4.7 && <5
     , bytestring
     , directory
     , http-types
