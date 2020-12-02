@@ -1,26 +1,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 import { Center } from 'Lib/Align'
-import { Home } from 'Logo'
+import { Home } from 'Lib/Logo'
 import { TopPage } from 'Pages/TopPage'
-import { CsvTablePage } from 'Pages/CsvTablePage'
-import { CardPage } from 'Pages/CardPage'
+import { BundleTablePageAsync, CardPageAsync } from 'Pages/Async'
 
 const App = (
     <Router>
         <Center>
-            <Home></Home>
+            <Link to="/">
+                <Home></Home>
+            </Link>
             <Switch>
                 <Route exact path="/">
                     <TopPage></TopPage>
                 </Route>
-                <Route exact path="/csv/table/:name">
-                    <CsvTablePage></CsvTablePage>
+                <Route exact path="/bundle/table/:name">
+                    <BundleTablePageAsync></BundleTablePageAsync>
                 </Route>
-                <Route exact path="/csv/learn/:name">
-                    <CardPage></CardPage>
+                <Route exact path="/bundle/learn/:name">
+                    <CardPageAsync></CardPageAsync>
                 </Route>
             </Switch>
         </Center>

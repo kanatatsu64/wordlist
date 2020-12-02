@@ -25,7 +25,7 @@ stack exec wordlist-exe
 
 ## テストの実行方法
 
-### Frontent
+### Frontend
 未実装
 
 ### Backend
@@ -40,3 +40,19 @@ stack test
 cd scripts
 python3 test-helper.py
 ```
+
+## Pluginの追加方法
+
+### Backend
+
+1. `src/Plugins/`下にPluginを作成する。
+2. PluginIDを他のPluginと被らないように決め打ちし、pluginidとしてPluginデータに加える。
+
+### Frontend
+
+1. `client/src/Plugins/`下にPluginを作成する。
+2. `client/src/Plugin.ts`の`loadModule`関数にPluginIDとPluginのimport文を追加する。
+
+## 資料
+
+- [URLリファレンス](https://github.com/kanatatsu64/wordlist/blob/master/URL.txt)

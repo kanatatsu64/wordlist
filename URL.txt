@@ -1,0 +1,15 @@
+/   GET: トップページを表示
++---/bundle
+|      +------/table/:name  GET: Bundleのカード一覧を表示
+|      +------/learn/:name  GET: Bundle学習ページの表示
+|
++---/api
+      +----/bundle
+      |       +------/name/:name     GET: Bundleを取得
+      |       +------/list           GET: Bundleをすべて取得
+      |       |         +----/name   GET: Bundleの名前だけすべて取得
+      |       +------/uuid/:uuid     GET: Bundleを取得 (not yet)
+      +----/card
+              +------/word/:word     GET: Cardを取得 (not yet)
+              +------/uuid/:uuid     GET: Cardを取得 (not yet)
+              

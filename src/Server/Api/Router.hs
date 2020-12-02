@@ -3,7 +3,7 @@ module Server.Api.Router (
 ) where
 
 import Server.Internal.Router ( mount )
-import qualified Server.Api.Csv.Router as Csv ( router )
+import qualified Server.Api.Bundle.Router as Bundle ( router )
 
 router = do
-    mount "csv" Csv.router
+    mount "bundle" Bundle.router

@@ -1,25 +1,26 @@
 import React from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 
-import { CSV, getByName } from 'Api/Csv'
-import { Card } from 'Api/Types'
+import { Bundle, Card } from 'Types'
+import { getByName } from 'Api/Bundle'
 
 type PropsType = { }
 
-export const CsvTablePage: React.FC<PropsType> = props => {
+export const BundleTablePage: React.FC<PropsType> = props => {
     const { name } = useParams()
 
     const history = useHistory()
-    const [csv, setCsv] = React.useState<CSV>(undefined)
+    const [bundle, setBundle] = React.useState<Bundle>(undefined)
+    const cards = bundle?.cards
 
     React.useEffect(() => {
         (async () => {
-            setCsv(await getByName(name))
+            setBundle(await getByName(name))
         })()
     }, [name])
 
     const onStartLearning = () => {
-        history.push(`/csv/learn/${ name }`)
+        history.push(`/bundle/learn/${ name }`)
     }
 
     const viewCards = (cards: Card[]) => (
@@ -50,7 +51,7 @@ export const CsvTablePage: React.FC<PropsType> = props => {
         <div>
             <h1>{ name }</h1>
             <button onClick={ onStartLearning }>Start Learning</button>
-            { !!csv ? viewCards(csv.cards) : loading }
+            { !!cards ? viewCards(cards) : loading }
         </div>
     )
 }

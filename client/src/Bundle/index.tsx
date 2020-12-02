@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom'
 import { Row } from 'Lib/Row'
 import { Link } from 'Lib/Link'
 
-import { Uploader } from 'Csv/Uploader'
+import { Uploader } from 'Bundle/Uploader'
 
 const Main = (
     <Uploader />

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Card } from 'Api/Types'
+import { Card } from 'Types'
 
 type PropsType = {
     card: Card,

@@ -1,8 +1,8 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 
-import { getNameList } from 'Api/Csv'
-import { Item } from 'Csv/Item'
+import { getNameList } from 'Api/Bundle'
+import { Item } from 'Bundle/Item'
 import { FCList } from 'Lib/FCList'
 import { ListItem } from 'Lib/ListItem'
 
@@ -19,7 +19,7 @@ export const TopPage: React.FC<PropsType> = props => {
     }, [])
 
     const onSelect = name => {
-        history.push(`/csv/table/${ name }`)
+        history.push(`/bundle/table/${ name }`)
     }
     const onDelete = name => {
         alert(`delete ${ name }`)

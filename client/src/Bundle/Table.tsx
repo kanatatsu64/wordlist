@@ -1,12 +1,16 @@
 import React from 'react'
 
-import { CSV } from 'Api/CSV'
+import { Bundle, Card } from 'Types'
 import { Item } from 'Card/Item'
 
-type PropsType = { csv: CSV, onSelect: (CSV) => void, onDelete: (CSV) => void }
+type PropsType = {
+    bundle: Bundle,
+    onSelect: (card: Card) => void,
+    onDelete: (card: Card) => void
+}
 
 export const Table : React.FC<PropsType> = props => {
-    const { csv: { name, cards } } = props
+    const { bundle: { name, desc, cards } } = props
 
     const onSelect = props.onSelect
     const onDelete = props.onDelete
@@ -16,10 +20,11 @@ export const Table : React.FC<PropsType> = props => {
             <li><Item card={ card } onSelect={ onSelect } onDelete={ onDelete }></Item></li>
         ))
     ), [cards])
+    const title = name + (desc ? '('+ desc +')' : '')
 
     return (
         <div>
-            <h1>{ name }</h1>
+            <h1>{ title }</h1>
             <ul>{ items }</ul>
         </div>
     )

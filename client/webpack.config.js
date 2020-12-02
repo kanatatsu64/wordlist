@@ -4,8 +4,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 
 module.exports = {
     entry: {
-        top: path.resolve(__dirname, 'src/index.tsx'),
-        csv: path.resolve(__dirname, 'src/Csv/index.tsx')
+        top: path.resolve(__dirname, 'src/index.tsx')
     },
     output: {
         filename: '[name].[contenthash].bundle.js',
@@ -52,6 +51,7 @@ module.exports = {
     ],
     optimization: {
         splitChunks: {
+            chunks: 'async',
             cacheGroups: {
                 libs: {
                     test: /src[\/\\]Lib/,

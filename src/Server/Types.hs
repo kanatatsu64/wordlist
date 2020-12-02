@@ -25,6 +25,8 @@ import qualified Data.Text.Lazy.Encoding ( encodeUtf8, decodeUtf8 )
 import Data.ByteString ( ByteString )
 import qualified Data.ByteString.Lazy ( ByteString )
 
+import Utils ( maybeToFail )
+
 type LazyByteString = Data.ByteString.Lazy.ByteString
 
 lazyEncode :: String -> LazyByteString
@@ -66,8 +68,8 @@ exists key ((key', _):ps)
     | otherwise = exists key ps
 exists _ [] = False
 
-lookup :: Key -> [Param] -> Maybe Value
+lookup :: MonadFail m => Key -> [Param] -> m Value
 lookup key ((key', mval'):ps)
-    | key == key' = mval'
+    | key == key' = maybeToFail "parameter does not have a value" mval'
     | otherwise = lookup key ps
-lookup _ [] = Nothing
+lookup key [] = fail $ "parameter is not found: " ++ decode key

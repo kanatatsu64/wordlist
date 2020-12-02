@@ -1,8 +1,8 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
-import { Card } from 'Api/Types'
-import { CSV, getByName } from 'Api/Csv'
+import { Bundle, Card } from 'Types'
+import { getByName } from 'Api/Bundle'
 import { View } from 'Card/View'
 
 type PropsType = { }
@@ -10,14 +10,14 @@ type PropsType = { }
 export const CardPage : React.FC<PropsType> = props => {
     const { name } = useParams()
 
-    const [csv, setCsv] = React.useState<CSV>(undefined)
-    const size = React.useMemo(() => csv?.cards.length, [csv])
+    const [bundle, setBundle] = React.useState<Bundle>(undefined)
+    const size = bundle?.cards.length
     const [index, setIndex] = React.useState(0)
-    const card = React.useMemo(() => csv?.cards[index], [csv, index])
+    const card = bundle?.cards[index]
 
     React.useEffect(() => {
         (async () => {
-            setCsv(await getByName(name))
+            setBundle(await getByName(name))
             setIndex(0)
         })()
     }, [name])
