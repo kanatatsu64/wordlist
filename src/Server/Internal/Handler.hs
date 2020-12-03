@@ -26,13 +26,16 @@ data Env = Env {
     request :: Request
 }
 
-type HandlerDSL a = Reader Env a
+type HandlerDSL a = Env -> a
+
+buildHandler :: HandlerDSL a -> Env -> a
+buildHandler = id
 
 getEnv :: HandlerDSL Env
-getEnv = ask
+getEnv = id
 
 gets :: (Env -> a) -> HandlerDSL a
-gets = asks
+gets = id
 
 getBody :: HandlerDSL Body
 getBody = gets body
@@ -53,7 +56,7 @@ instance Handlable Controller where
 
 instance Handlable (HandlerDSL (IO Response)) where
     toController m = \body params request ->
-        runReader m $ Env body params request
+        buildHandler m $ Env body params request
 
 {-
     instance Handlable (IO Controller) where
