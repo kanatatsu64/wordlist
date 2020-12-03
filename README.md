@@ -3,6 +3,8 @@
 
 [test locally](http://localhost:3000)
 
+SQLite3に依存しているため、事前にインストールが必要（後述）。
+
 ## プログラムの実行方法
 
 ### Frontend
@@ -52,6 +54,22 @@ python3 test-helper.py
 
 1. `client/src/Plugins/`下にPluginを作成する。
 2. `client/src/Plugin.ts`の`loadModule`関数にPluginIDとPluginのimport文を追加する。
+
+## SQLite3のインストール
+
+### Windowsの場合
+
+1. [公式ページ](https://www.sqlite.org/download.html)から`sqlite-amalgamation`と`sqlite-dll`を`C:\sqlite`等のフォルダにダウンロードする。
+2. `stack path --stack-root`を実行して、stackのルートパスを調べる。
+3. stackのルートパスにある`config.yaml`に以下を追記する。
+
+```yaml:config.yaml
+# Extra directories used by stack for building
+extra-include-dirs:
+- C:\sqlite
+extra-lib-dirs:
+- C:\sqlite
+```
 
 ## 資料
 
