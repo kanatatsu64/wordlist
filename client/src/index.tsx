@@ -3,16 +3,15 @@ import ReactDOM from 'react-dom'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 
 import { Center } from 'Lib/Align'
-import { Home } from 'Lib/Logo'
+import { Header } from 'Parts/Header'
 import { TopPage } from 'Pages/TopPage'
 import { BundleTablePageAsync, CardPageAsync } from 'Pages/Async'
+import './index.scss'
 
 const App = (
     <Router>
+        <Header></Header>
         <Center>
-            <Link to="/">
-                <Home></Home>
-            </Link>
             <Switch>
                 <Route exact path="/">
                     <TopPage></TopPage>
