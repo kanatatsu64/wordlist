@@ -10,7 +10,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 
 import Html ( Htmlizable (..), export )
-import TestUtils ( getCardMock )
+import TestUtils ( getCardMock, getTestUUID )
 import Bundle ( Bundle (..) )
 
 test_all = testGroup "Bundle" [
@@ -23,8 +23,9 @@ test_toHtml = testGroup "toHtml" [
     ]
     where
         test_toHtml1 = testCase "toHtml 1" do
+            uuid <- getTestUUID
             card <- getCardMock "card mock"
-            let bundle = Bundle "german" "" [card]
+            let bundle = Bundle uuid "german" "" [card]
                 expected = "<table>" ++
                                "<caption>german</caption>" ++
                                (export . toHtml) card ++
@@ -32,9 +33,10 @@ test_toHtml = testGroup "toHtml" [
                 actual = export $ toHtml bundle
             assertEqual "toHtml simple bundle" expected actual
         test_toHtml2 = testCase "toHtml 2" do
+            uuid <- getTestUUID
             card1 <- getCardMock "card mock 1"
             card2 <- getCardMock "card mock 2"
-            let bundle = Bundle "german" "from textbook" [card1, card2]
+            let bundle = Bundle uuid "german" "from textbook" [card1, card2]
                 expected = "<table>" ++
                                "<caption>german (from textbook)</caption>" ++
                                (export . toHtml) card1 ++
