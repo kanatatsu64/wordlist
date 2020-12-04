@@ -1,11 +1,11 @@
 import React from 'react'
-import style from '.ListStyle.scss'
+import style from './ListStyle.scss'
 
 type PropsType = {
-    records: [{
+    records: {
         item: React.ReactElement,
-        key: any
-    }]
+        key: React.ReactText
+    }[]
 }
 
 export const List: React.FC<PropsType> = props => {

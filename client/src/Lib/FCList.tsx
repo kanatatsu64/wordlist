@@ -1,5 +1,6 @@
 import React from 'react'
-import style from './FCListStyle.scss'
+
+import { List } from 'Lib/List'
 
 type PropsType<V> = {
     values: V[],
@@ -10,16 +11,13 @@ type PropsType<V> = {
 export class FCList<V> extends React.Component<PropsType<V>, {}> {
     render() {
         const { values, keyGen, itemGen } = this.props
+        const records = values.map(value => {
+            const key = keyGen(value)
+            const item = itemGen(value)
+            return { item, key }
+        })
         return (
-            <ul className={ style.list }>
-                {values.map(value => {
-                    const key = keyGen(value)
-                    const item = itemGen(value)
-                    return (
-                        <li className={ style.item } key={ key }>{ item }</li>
-                    )
-                })}
-            </ul>
+            <List records={ records }></List>
         )
     }
 }
