@@ -45,10 +45,14 @@ python3 test-helper.py
 
 ## Pluginの追加方法
 
+### PluginID
+
+1. PluginIDを他のPluginと被らないように決め打ちし、`Plugins.txt`に書き加える。
+
 ### Backend
 
 1. `src/Plugins/`下にPluginを作成する。
-1. PluginIDを他のPluginと被らないように決め打ちし、pluginidとしてPluginデータに加える。
+1. PluginIDをpluginidとしてPluginデータに加える。
 
 ### Frontend
 
@@ -75,3 +79,4 @@ extra-lib-dirs:
 ## 資料
 
 - [URLリファレンス](https://github.com/kanatatsu64/wordlist/blob/master/URL.txt)
+- [Plugin一覧](https://github.com/kanatatsu64/wordlist/blob/master/Plugins.txt)
