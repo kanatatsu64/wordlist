@@ -13,8 +13,9 @@ import qualified UUID ( toString )
 
 import Serializable ( Serializable (..) )
 import Server.Json ( Json (..), Ary (..), Dict (..), Rec (..) )
-import qualified Card ( Language (..), Card (..) )
+import qualified Card ( Card (..) )
 import qualified Bundle ( Bundle (..) )
+import qualified Types ( Language (..) )
 
 data Language = Japanese | English | Chinese | French | German
 
@@ -27,6 +28,7 @@ instance Json Language where
 
 data Card = Card {
     cardid :: String,
+    pluginid :: String,
     language :: Language,
     word :: String,
     meaning :: String,
@@ -34,28 +36,30 @@ data Card = Card {
 }
 
 instance Json Card where
-    jsonify (Card cardid language word meaning attributes) = jsonify $ Dict [
+    jsonify (Card cardid pluginid language word meaning attrs) = jsonify $ Dict [
             Rec "cardid" cardid,
+            Rec "pluginid" pluginid,
             Rec "language" language,
             Rec "word" word,
             Rec "meaning" meaning,
-            Rec "attributes" (Ary attributes)
+            Rec "attrs" (Ary attrs)
         ]
 
-convertLanguage :: Card.Language -> Language
-convertLanguage Card.Japanese = Japanese
-convertLanguage Card.English = English
-convertLanguage Card.Chinese =Chinese
-convertLanguage Card.French = French
-convertLanguage Card.German = German
+convertLanguage :: Types.Language -> Language
+convertLanguage Types.Japanese = Japanese
+convertLanguage Types.English = English
+convertLanguage Types.Chinese =Chinese
+convertLanguage Types.French = French
+convertLanguage Types.German = German
 
 convertCard :: Card.Card -> Card
-convertCard card = Card cardid language word meaning attributes
+convertCard card = Card cardid pluginid language word meaning attrs
     where cardid = UUID.toString $ Card.cardid card
+          pluginid = UUID.toString $ Card.pluginid card
           language = convertLanguage $ Card.language card
           word = Card.word card
           meaning = Card.meaning card
-          attributes = map serialize $ Card.attributes card
+          attrs = map serialize $ Card.attrs card
 
 data Bundle = Bundle {
     name :: String,

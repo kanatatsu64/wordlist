@@ -6,10 +6,15 @@ module Utils (
     split,
     maybeToFail,
     for,
-    (<@>)
+    (<@>),
+    withIndex,
+    cons,
+    shrink,
+    same
 ) where
 
 import System.IO
+import Control.Applicative
 import Control.Monad.Cont
 import Control.Monad.State
 import Data.Functor.Identity
@@ -53,3 +58,19 @@ infixl 4 <@>
 
 (<@>) :: Applicative f => f (a -> b) -> a -> f b
 (<@>) h x = ($ x) <$> h
+
+withIndex :: [a] -> [(Integer, a)]
+withIndex = zip [0..]
+
+cons :: Monoid a => (a -> a -> a) -> [a] -> a
+cons _ [] = mempty
+cons _ [x] = x
+cons f (x:xs) = f x (cons f xs)
+
+shrink :: (a -> a -> b) -> [a] -> [b]
+shrink _ [] = []
+shrink _ [_] = []
+shrink f (x:y:rs) = f x y:shrink f (y:rs)
+
+same :: Eq a => [a] -> Bool
+same = and . shrink (==)

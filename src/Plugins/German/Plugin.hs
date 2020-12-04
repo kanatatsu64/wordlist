@@ -4,9 +4,11 @@ module Plugins.German.Plugin (
 ) where
 
 import UUID ( UUID, fromString )
-import Card ( Card, CardID )
+import Serializable ( Serial (..) )
+import qualified Card ( Card (..) )
+import Types ( CardID, Language ( German ) )
 import Plugin ( Plugin (..) )
-import Plugins.German.Card ( GermanCard (..), Part (..), convertCard )
+import Plugins.German.Card ( GermanCard (..), Part (..) )
 
 import qualified Plugins.German.Noun as Noun ( parse )
 import qualified Plugins.German.Verb as Verb( parse )
@@ -22,13 +24,31 @@ getPlugin = do
     _uuid <- uuid
     return $ Plugin _uuid _toCard _fromCard
 
-_toCard :: CardID -> [String] -> Maybe Card
+_toCard :: CardID -> [String] -> Maybe Card.Card
 _toCard _cardid vals = do
     german <- parsePart vals (GermanCard _cardid)
-    return $ convertCard german
+    convertCard german
 
-_fromCard :: Card -> [String]
+_fromCard :: Card.Card -> [String]
 _fromCard = undefined
+
+buildAttributes :: GermanCard -> [Serial]
+buildAttributes = do
+    _part <- Serial . part
+    _attrs <- attrs
+    return $ [_part] <> _attrs
+
+convertCard :: GermanCard -> Maybe Card.Card
+convertCard german = do
+    let _cardid = cardid german
+        _language = German
+        _word = word german
+        _meaning = meaning german
+        _attributes = buildAttributes german
+        _note = note german
+        _examples = examples german
+    _pluginid <- uuid
+    return $ Card.Card _cardid _pluginid _language _word _meaning _attributes _note _examples
 
 isNoun :: String -> Bool
 isNoun "N" = True

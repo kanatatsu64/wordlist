@@ -6,9 +6,13 @@ module Serializable (
     Serializable (..)
 ) where
 
+import Composable ( Composable (..) )
 import UUID ( UUID, toString )
 
 data Serial = forall a. Serializable a => Serial a
+
+instance Composable Serial where
+    compose = return . Serial
 
 class Serializable a where
     serialize :: a -> String

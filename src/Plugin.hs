@@ -3,10 +3,8 @@ module Plugin (
     Plugin (..)
 ) where
 
-import Card ( Card, CardID )
-import UUID ( UUID )
-
-type PluginID = UUID
+import Card ( Card )
+import Types ( CardID, PluginID )
 
 data Plugin = Plugin {
     pluginid :: PluginID,
