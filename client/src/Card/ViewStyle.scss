@@ -1,0 +1,49 @@
+.triangle {
+    border-width: 3px 3px 0px 0px;
+    border-style: solid;
+    border-color: gray;
+    width: 10px;
+    height: 10px;
+    &.left {
+        -webkit-transform: rotate(225deg);
+        transform: rotate(225deg);
+    }
+    &.right {
+        -webkit-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+}
+
+.container {
+    width: 300px;
+    height: 120px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    & .arrow {
+        width: calc(30px - 4px);
+        height: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2px;
+        opacity: 0;
+        &:hover {
+            opacity: 1;
+        }
+    }
+    & .card {
+        width: calc(300px - 60px);
+        height: inherit;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px;
+        border-style: solid;
+        border-color: black;
+        padding: 5px;
+    }
+}

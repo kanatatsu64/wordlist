@@ -37,11 +37,14 @@ export const CardPage : React.FC<PropsType> = props => {
         next()
     }
 
+    const attrs = {
+        onLeftClick: onNotRemembered,
+        onRightClick: onRemembered
+    }
+
     const viewCard = (card: Card) => (
         <div>
-            <button onClick={ onNotRemembered }></button>
-            <View card={ card } key={ card.cardid }></View>
-            <button onClick={ onRemembered }></button>
+            <View card={ card } key={ card.cardid } { ...attrs } ></View>
         </div>
     )
     const loading = (
