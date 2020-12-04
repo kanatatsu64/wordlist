@@ -48,20 +48,21 @@ python3 test-helper.py
 ### Backend
 
 1. `src/Plugins/`下にPluginを作成する。
-2. PluginIDを他のPluginと被らないように決め打ちし、pluginidとしてPluginデータに加える。
+1. PluginIDを他のPluginと被らないように決め打ちし、pluginidとしてPluginデータに加える。
 
 ### Frontend
 
 1. `client/src/Plugins/`下にPluginを作成する。
-2. `client/src/Plugin.ts`の`loadModule`関数にPluginIDとPluginのimport文を追加する。
+1. `client/src/Plugin.ts`の`loadModule`関数にPluginIDとPluginのimport文を追加する。
 
 ## SQLite3のインストール
 
 ### Windowsの場合
 
 1. [公式ページ](https://www.sqlite.org/download.html)から`sqlite-amalgamation`と`sqlite-dll`を`C:\sqlite`等のフォルダにダウンロードする。
-2. `stack path --stack-root`を実行して、stackのルートパスを調べる。
-3. stackのルートパスにある`config.yaml`に以下を追記する。
+1. `sqlite-dll`は`C:\Windows\System32`にも追加する。
+1. `stack path --stack-root`を実行して、stackのルートパスを調べる。
+1. stackのルートパスにある`config.yaml`に以下を追記する。
 
 ```yaml:config.yaml
 # Extra directories used by stack for building
