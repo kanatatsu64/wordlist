@@ -12,7 +12,7 @@ export const View: React.FC<PropsType> = props => {
 
     const [isUpside, setIsUpside] = React.useState(true)
 
-    const pluginid = 'c2cc10e1-57d6-4b6f-9899-38d972112d8c'
+    const { pluginid } = card
     const plugin = loadPlugin(pluginid)
 
     const onReverse = () => {

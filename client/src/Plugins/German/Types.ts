@@ -105,19 +105,19 @@ export const convert = (card: Card): GermanCard => {
         language,
         word,
         meaning,
-        attributes
+        attrs,
+        note,
+        examples
     } = card
 
-    const part = convertPart(attributes[0])
-    const attrs = attributes.slice(1, 3) as [string, string]
-    const note = attributes[3]
-    const examples = buildExamples(attributes.slice(4))
+    const part = convertPart(attrs[0])
+    const _attrs = attrs.slice(1, 3) as [string, string]
 
     return {
         cardid,
         part,
         word,
-        attrs,
+        attrs: _attrs,
         meaning,
         note,
         examples

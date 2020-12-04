@@ -26,6 +26,11 @@ export const shorten = (language: Language) => {
     return ''
 }
 
+export type Example = {
+    original: string,
+    translation: string
+}
+
 export type Bundle = {
     name: string,
     desc: string,
@@ -34,8 +39,11 @@ export type Bundle = {
 
 export type Card = {
     cardid: CardID,
+    pluginid: PluginID,
     language: Language,
     word: string,
     meaning: string,
-    attributes: string[]
+    attrs: string[],
+    note: string,
+    examples: [Example]
 }
