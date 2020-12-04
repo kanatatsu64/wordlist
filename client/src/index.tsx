@@ -6,12 +6,13 @@ import { Center } from 'Lib/Align'
 import { Header } from 'Parts/Header'
 import { TopPage } from 'Pages/TopPage'
 import { BundleTablePageAsync, CardPageAsync } from 'Pages/Async'
+import style from './index.scss'
 import './index.scss'
 
 const App = (
     <Router>
         <Header></Header>
-        <Center>
+        <Center className={ style.container }>
             <Switch>
                 <Route exact path="/">
                     <TopPage></TopPage>

@@ -1,10 +1,16 @@
 import React from 'react'
 
+import { cons } from 'Utils'
 import style from './AlignStyle.scss'
 
-export const Center: React.FC<{}> = props => {
+type PropsTyle = {
+    className?: string
+}
+
+export const Center: React.FC<PropsTyle> = props => {
+    const className = cons([props.className, style.center])
     return (
-        <div className={ style.center }>
+        <div className={ className }>
             { props.children }
         </div>
     )
