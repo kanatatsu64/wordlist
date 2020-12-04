@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom'
 import { Bundle, Card } from 'Types'
 import { getByName } from 'Api/Bundle'
 import { View } from 'Card/View'
+import { Center } from 'Lib/Align'
 
 type PropsType = { }
 
@@ -54,9 +55,11 @@ export const CardPage : React.FC<PropsType> = props => {
     )
 
     return (
-        <div>
-            <h1>{ name }</h1>
+        <>
+            <Center>
+                <h1>{ name }</h1>
+            </Center>
             { !!card ? viewCard(card) : loading }
-        </div>
+        </>
     )
 }

@@ -3,6 +3,7 @@ import { useHistory, useParams } from 'react-router-dom'
 
 import { Bundle, Card } from 'Types'
 import { getByName } from 'Api/Bundle'
+import { Center } from 'Lib/Align'
 
 type PropsType = { }
 
@@ -35,8 +36,8 @@ export const BundleTablePage: React.FC<PropsType> = props => {
         const { word, meaning, cardid } = card
         return (
             <tr key={ cardid }>
-                <td>{ word }</td>
-                <td>{ meaning }</td>
+                <td><Center>{ word }</Center></td>
+                <td><Center>{ meaning }</Center></td>
             </tr>
         )
     }
@@ -48,10 +49,12 @@ export const BundleTablePage: React.FC<PropsType> = props => {
     )
 
     return (
-        <div>
-            <h1>{ name }</h1>
-            <button onClick={ onStartLearning }>Start Learning</button>
+        <>
+            <Center>
+                <h1>{ name }</h1>
+                <button onClick={ onStartLearning }>Start Learning</button>
+            </Center>
             { !!cards ? viewCards(cards) : loading }
-        </div>
+        </>
     )
 }

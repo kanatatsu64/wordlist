@@ -5,6 +5,7 @@ import { getNameList } from 'Api/Bundle'
 import { Item } from 'Bundle/Item'
 import { FCList } from 'Lib/FCList'
 import { ListItem } from 'Lib/ListItem'
+import { Center } from 'Lib/Align'
 
 type PropsType = { }
 
@@ -36,9 +37,11 @@ export const TopPage: React.FC<PropsType> = props => {
     const getKey = (name: string) => name
 
     return (
-        <div>
-            <h1>Bundle List</h1>
+        <>
+            <Center>
+                <h1>Bundle List</h1>
+            </Center>
             <FCList values={ csvNames } itemGen={ getItem } keyGen={ getKey }></FCList>
-        </div>
+        </>
     )
 }
