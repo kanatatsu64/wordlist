@@ -5,20 +5,17 @@ module Server.Api.Bundle.List (
     getNameList
 ) where
 
-import Prelude hiding ( Word, lookup )
-
 import Control.Monad
 
 import Directory ( listCsvs, listCsvNames, getName, delExt )
 import Csv ( loadCsv )
 import Bundle ( Bundle (..) )
-import UUID ( fromString )
+import UUID ( getRandom )
 import qualified Plugins.German.Base as German ( getPlugin )
 
 import Server.Json ( Json (..), Ary (..) )
 import Server.Handler ( handler )
 import Server.Response ( json )
-import Server.Types ( lookup, decode )
 import Server.Api.Types ( convertBundle )
 
 getList = handler $ do
@@ -26,8 +23,9 @@ getList = handler $ do
     paths <- listCsvs "resource/"
     bundles <- forM paths $ \path -> do
         let name = delExt $ getName path
+        uuid <- getRandom
         cards <- loadCsv plugin path
-        let bundle = Bundle name "" cards
+        let bundle = Bundle uuid name "" cards
         return $ convertBundle bundle
     json $ jsonify $ Ary bundles
 

@@ -62,20 +62,23 @@ convertCard card = Card cardid pluginid language word meaning attrs
           attrs = map serialize $ Card.attrs card
 
 data Bundle = Bundle {
+    bundleid :: String,
     name :: String,
     desc :: String,
     cards :: [Card]
 }
 
 instance Json Bundle where
-    jsonify (Bundle name desc cards) = jsonify $ Dict [
+    jsonify (Bundle bundleid name desc cards) = jsonify $ Dict [
+            Rec "bundleid" bundleid,
             Rec "name" name,
             Rec "desc" desc,
             Rec "cards" (Ary cards)
         ]
 
 convertBundle :: Bundle.Bundle -> Bundle
-convertBundle bundle = Bundle name desc cards
-    where name = Bundle.name bundle
+convertBundle bundle = Bundle bundleid name desc cards
+    where bundleid = UUID.toString $ Bundle.bundleid bundle
+          name = Bundle.name bundle
           desc = Bundle.desc bundle
           cards = map convertCard $ Bundle.cards bundle

@@ -6,6 +6,8 @@ export type UUID = string
 
 export type PluginID = UUID
 
+export type BundleID = UUID
+
 export type CardID = UUID
 
 export type Language =
@@ -27,23 +29,24 @@ export const shorten = (language: Language) => {
 }
 
 export type Example = {
-    original: string,
+    original: string
     translation: string
 }
 
 export type Bundle = {
-    name: string,
-    desc: string,
+    bundleid: BundleID
+    name: string
+    desc: string
     cards: Card[]
 }
 
 export type Card = {
-    cardid: CardID,
-    pluginid: PluginID,
-    language: Language,
-    word: string,
-    meaning: string,
-    attrs: string[],
-    note: string,
-    examples: [Example]
+    cardid: CardID
+    pluginid: PluginID
+    language: Language
+    word: string
+    meaning: string
+    attrs: string[]
+    note: string
+    examples: Example[]
 }

@@ -30,7 +30,8 @@ csvToHtml name desc ifname ofname = execCont $ do
 
         return $ do
             cards <- execWriterT (loop hifile)
-            let bundle = Bundle name desc cards
+            uuid <- UUID.getRandom
+            let bundle = Bundle uuid name desc cards
             hPutStr hofile $ (export . template . toHtml) bundle
     where loop :: Handle -> WriterT [Card] IO ()
           loop handle = do

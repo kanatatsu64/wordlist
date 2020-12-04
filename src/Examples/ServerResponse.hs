@@ -24,7 +24,8 @@ buildHtml name desc ifname = execCont $ do
 
         return $ do
             cards <- execWriterT (loop hifile)
-            let bundle = Bundle name desc cards
+            uuid <- UUID.getRandom
+            let bundle = Bundle uuid name desc cards
             return $ (export . template . toHtml) bundle
     where loop :: Handle -> WriterT [Card] IO ()
           loop handle = do

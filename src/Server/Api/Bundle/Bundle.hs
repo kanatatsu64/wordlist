@@ -9,6 +9,7 @@ import Prelude hiding ( lookup )
 import Csv ( loadCsv )
 import Bundle ( Bundle (..) )
 import Directory ( doesFileExist )
+import UUID ( getRandom )
 import Server.Types ( decode, lookup )
 import Server.Handler ( handler )
 import Server.Response ( notFound )
@@ -23,6 +24,7 @@ getHandler = handler $ \params -> do
     if exist
     then do
         plugin <- German.getPlugin
+        uuid <- getRandom
         cards <- loadCsv plugin path
-        bundle $ Bundle name "" cards
+        bundle $ Bundle uuid name "" cards
     else notFound

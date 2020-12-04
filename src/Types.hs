@@ -3,7 +3,8 @@ module Types (
     Language (..),
     Note,
     Example (..),
-    PluginID
+    PluginID,
+    BundleID
 ) where
 
 import Serializable ( Serializable (..) )
@@ -34,3 +35,5 @@ type Note = String
 data Example = Example { original :: String, translation :: String }
 
 type PluginID = UUID
+
+type BundleID = UUID
