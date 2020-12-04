@@ -9,7 +9,10 @@ module Card (
     cardTable,
     attrTable,
     exampleTable,
-    save
+    runSave,
+    runLoad,
+    save,
+    load
 ) where
 
 import Control.Monad
@@ -19,17 +22,17 @@ import Html (Htmlizable (..), Html (..), TagName (..), Content (..) )
 import Serializable ( Serializable (..), Serial (..) )
 import Composable ( Composable (..) )
 import SQL (
+        IConnection,
         ISchema (..),
+        execRuntime,
+        Runtime,
         Table,
-        database,
         toSql,
         maybeFromSql,
-        contConnection,
-        contTransaction,
         runInsert,
         runSelect
     )
-import Utils ( withIndex, execCont, same, for, maybeToFail )
+import Utils ( withIndex, same, for, maybeToFail )
 import Types ( CardID, Language (..), Note, Example (..), PluginID )
 
 data Card = Card {
@@ -178,42 +181,42 @@ fromSchemas cardSchema attrSchemas exampleSchemas = do
                             return $ Example _original _translation
     return $ Card _cardid _pluginid _language _word _meaning _attrs _note _examples
 
-save :: Card -> IO ()
-save card = execCont do
-    conn <- contConnection database
-    trans <- contTransaction conn
-    return do
+runSave :: IConnection conn => Card -> Runtime conn ()
+runSave card conn = do
         let cardSchema = toCardSchema card
             attrSchemas = toAttrSchemas card
             exampleSchemas = toExampleSchemas card
-        runInsert cardTable (toRecords cardSchema) trans
+        runInsert cardTable (toRecords cardSchema) conn
         sequence_ do
             schema <- attrSchemas
-            return $ runInsert attrTable (toRecords schema) trans
+            return $ runInsert attrTable (toRecords schema) conn
         sequence_ do
             schema <- exampleSchemas
-            return $ runInsert exampleTable (toRecords schema) trans
+            return $ runInsert exampleTable (toRecords schema) conn
+
+save :: Card -> IO ()
+save card = execRuntime $ runSave card
+
+runLoad :: IConnection conn => CardID -> Runtime conn Card
+runLoad _cardid conn = do
+        let val = toSql $ serialize _cardid
+        crs <- runSelect cardTable (columns @CardSchema undefined) ("id = ?", [val]) conn
+        css <- mapM (maybeToFail "failed to parse Card table" . fromRecords) crs
+        cards <- sequence do
+            cs <- css
+            return do
+                ars <- runSelect attrTable (columns @AttrSchema undefined) ("cardid = ?", [val]) conn
+                ass <- mapM (maybeToFail "failed to parse Attr table" . fromRecords) ars
+                ers <- runSelect exampleTable (columns @ExampleSchema undefined) ("cardid = ?", [val]) conn
+                ess <- mapM (maybeToFail "failed to parse Example table" . fromRecords) ers
+                maybeToFail "failed to compose Card" $ fromSchemas cs ass ess
+        case length cards of
+            1 -> return $ head cards
+            0 -> fail "Card is not found"
+            _ -> fail "multiple Cards are found"
 
 load :: CardID -> IO Card
-load _cardid = execCont do
-        conn <- contConnection database
-        trans <- contTransaction conn
-        let val = toSql $ serialize _cardid
-        return do
-            crs <- runSelect cardTable (columns @CardSchema undefined) ("id = ?", [val]) trans
-            css <- mapM (maybeToFail "failed to parse Card table" . fromRecords) crs
-            cards <- sequence do
-                cs <- css
-                return do
-                    ars <- runSelect attrTable (columns @AttrSchema undefined) ("cardid = ?", [val]) trans
-                    ass <- mapM (maybeToFail "failed to parse Attr table" . fromRecords) ars
-                    ers <- runSelect exampleTable (columns @ExampleSchema undefined) ("cardid = ?", [val]) trans
-                    ess <- mapM (maybeToFail "failed to parse Example table" . fromRecords) ers
-                    maybeToFail "failed to compose Card" $ fromSchemas cs ass ess
-            case length cards of
-                1 -> return $ head cards
-                0 -> fail "Card is not found"
-                _ -> fail "multiple Cards are found"
+load _cardid = execRuntime $ runLoad _cardid
 
 _toHtml card = Tag TD [] [
         Child $ Tag TD [] [Text $ serialize $ language card],
