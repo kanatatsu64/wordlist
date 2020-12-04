@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE FlexibleContexts #-}
 
 module SQL (
@@ -58,6 +59,8 @@ import Database.HDBC
 import Data.Convertible ( Convertible )
 import Database.HDBC.Sqlite3 ( connectSqlite3, Connection )
 
+import Utils ( execCont )
+
 database :: Database
 database = "resource/database"
 
@@ -87,8 +90,11 @@ maybeFromSql sval = case safeFromSql sval of
 
 type Runtime c a = c -> IO a
 
-execRuntime :: Runtime c a -> c -> IO a
-execRuntime = id
+execRuntime :: (forall c. IConnection c => Runtime c a) -> IO a
+execRuntime runtime = execCont do
+    conn <- contConnection database
+    trans <- contTransaction conn
+    return $ runtime trans
 
 runSQL :: IConnection conn => SQL -> [SqlValue] -> Runtime conn Integer
 runSQL sql vals conn = run conn sql vals
