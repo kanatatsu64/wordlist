@@ -1,3 +1,5 @@
+@import "Lib/_colors";
+
 .logo {
     display: inline-block;
     cursor: default;
@@ -5,7 +7,7 @@
         padding: 10px;
         font-size: 2em;
         font-family: Georgia, 'Times New Roman', Times, serif;
-        color: #D4D8E0;
+        color: $back;
         display: block;
     }
 }
