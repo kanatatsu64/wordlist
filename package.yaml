@@ -10,6 +10,11 @@ extra-source-files:
 - README.md
 - ChangeLog.md
 
+default-extensions:
+- BlockArguments
+- LambdaCase
+- TypeApplications
+
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
 # category:            Web
@@ -20,22 +25,25 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/githubuser/wordlist#readme>
 
 dependencies:
-- mtl
-- transformers
-- bytestring
-- text
-- wai
-- wai-extra
-- warp
-- http-types
-- directory
-- uuid
-- HDBC
-- HDBC-sqlite3
 - base >= 4.7 && < 5
 
 library:
   source-dirs: src
+  dependencies:
+  - mtl
+  - transformers
+  - bytestring
+  - text
+  - wai
+  - wai-extra
+  - warp
+  - http-types
+  - directory
+  - uuid
+  - HDBC
+  - HDBC-sqlite3
+  - convertible
+  - sort
 
 executables:
   wordlist-exe:
