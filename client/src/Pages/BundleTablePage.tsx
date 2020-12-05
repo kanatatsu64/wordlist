@@ -38,6 +38,7 @@ export const BundleTablePage: React.FC<PropsType> = props => {
 
     const viewCards = (cards: Card[]) => (
         <Dial onNext={ onNext } onPrev={ onPrev }>
+            <Center>
             <table>
                 <tbody>
                     <Sequence from={ from } count={ 3 }>
@@ -53,6 +54,7 @@ export const BundleTablePage: React.FC<PropsType> = props => {
                     </Sequence>
                 </tbody>
             </table>
+            </Center>
         </Dial>
     )
 
