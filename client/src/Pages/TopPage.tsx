@@ -47,7 +47,7 @@ export const TopPage: React.FC<PropsType> = props => {
     const onDelete = (bundleInfo: BundleInfo) => {
         alert(`delete ${ bundleInfo.name }`)
     }
-    const onCreate = () => {
+    const onCreated = () => {
         closeModal()
         updateBundleInfos()
     }
@@ -72,7 +72,7 @@ export const TopPage: React.FC<PropsType> = props => {
                 isOpen={ isOpen }
                 onRequestClose={ closeModal }
             >
-                <CreateForm onCreate={ onCreate }></CreateForm>
+                <CreateForm onCreated={ onCreated }></CreateForm>
             </Modal>
         </>
     )

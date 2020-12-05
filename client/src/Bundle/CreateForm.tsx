@@ -4,7 +4,8 @@ import { create } from 'Api/Bundle'
 import style from './CreateFormStyle.scss'
 
 type PropsType = {
-    onCreate: () => void
+    onCreate?: () => void
+    onCreated?: () => void
 }
 
 export const CreateForm: React.FC<PropsType> = props => {
@@ -20,8 +21,9 @@ export const CreateForm: React.FC<PropsType> = props => {
 
     const onSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
+        if (props.onCreate) props.onCreate()
         await create(name, desc)
-        props.onCreate()
+        if (props.onCreated) props.onCreated()
     }
 
     return (
