@@ -40,6 +40,12 @@ export type Bundle = {
     cards: Card[]
 }
 
+export type BundleInfo = {
+    bundleid: BundleID
+    name: string
+    desc: string
+}
+
 export type Card = {
     cardid: CardID
     pluginid: PluginID
