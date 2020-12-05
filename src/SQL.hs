@@ -39,18 +39,7 @@ module SQL (
     runInsert,
     runUpdate,
     runDelete,
-    module Database.HDBC,
-
-    selectBuilder,
-    fromBuilder,
-    whereBuilder,
-    insertBuilder,
-    valuesBuilder,
-    updateBuilder,
-    setBuilder,
-    deleteBuilder,
-    createTableBuilder,
-    createDatabaseBuilder
+    module Database.HDBC
 ) where
 
 import Control.Monad.Cont
@@ -119,120 +108,153 @@ class ISchema a where
     toRecords :: a -> [Record]
     fromRecords :: [Record] -> Maybe a
 
-type SQLDSL = Writer SQL ()
+type SQLDSL m = WriterT SQL m ()
 
-buildSQL :: SQLDSL -> SQL
-buildSQL dsl = execWriter dsl ++ ";"
+buildSQL :: MonadFail m => SQLDSL m -> m SQL
+buildSQL dsl = do
+        sql <- execWriterT dsl
+        return $ sql ++ ";"
 
-nop :: SQLDSL
+validateTable :: MonadFail m => Table -> m ()
+validateTable table =
+    if validate table
+    then return ()
+    else fail "invalid table"
+    where
+        validate "" = False
+        validate _ = True
+
+validateDatabase :: MonadFail m => Table -> m ()
+validateDatabase db =
+    if validate db
+    then return ()
+    else fail "invalid database"
+    where
+        validate "" = False
+        validate _ = True
+
+nop :: MonadFail m => SQLDSL m
 nop = return ()
 
-select :: [Column] -> SQLDSL
-select cols = tell $ selectBuilder cols
+select :: MonadFail m => [Column] -> SQLDSL m
+select cols = do
+    part <- toStrs cols
+    tell $ "SELECT " ++ part ++ " "
+    where
+        toStrs [c] = return c
+        toStrs (c:cs) = do
+            part <- toStrs cs
+            return $ c ++ "," ++ part
+        toStrs _ = fail "columns cannot be empty"
 
-selectBuilder :: [Column] -> SQL
-selectBuilder cols = sql
-    where sql = "SELECT " ++ toStrs cols ++ " "
-          toStrs [c] = c
-          toStrs (c:cs) = c ++ "," ++ toStrs cs
+from :: MonadFail m => Table -> SQLDSL m
+from table = do
+    validateTable table
+    tell $ "FROM " ++ table ++ " "
 
-from :: Table -> SQLDSL
-from table = tell $ fromBuilder table
+where_ :: MonadFail m => Condition -> SQLDSL m
+where_ (csql, _) = do
+    tell $ "WHERE " ++ csql ++ " "
 
-fromBuilder :: Table -> SQL
-fromBuilder table = sql
-    where sql = "FROM " ++ table ++ " "
+insert :: MonadFail m => Table -> [Column] -> SQLDSL m
+insert table recs = do
+    validateTable table
+    part <- toStrs recs
+    tell $ "INSERT INTO " ++ table ++ " (" ++
+            part ++
+            ") "
+    where
+        toStrs [c] = return c
+        toStrs (c:cs) = do
+            part <- toStrs cs
+            return $ c ++ "," ++ part
+        toStrs _ = fail "columns cannot be empty"
 
-where_ :: Condition -> SQLDSL
-where_ cond = tell $ whereBuilder cond
+values :: MonadFail m => [SqlValue] -> SQLDSL m
+values vals = do
+    part <- toPhs vals
+    tell $ "VALUES (" ++ part ++ ") "
+    where
+        toPhs [_] = return "?"
+        toPhs (_:vs) = do
+            part <- toPhs vs
+            return $ "?," ++ part
+        toPhs _ = fail "values cannot be empty"
 
-whereBuilder :: Condition -> SQL
-whereBuilder (csql,_) = "WHERE " ++ csql ++ " "
+update :: MonadFail m => Table -> SQLDSL m
+update table = do
+    validateTable table
+    tell $ "UPDATE " ++ table ++ " "
 
-insert :: Table -> [Column] -> SQLDSL
-insert table recs = tell $ insertBuilder table recs
+set :: MonadFail m => [Record] -> SQLDSL m
+set recs = do
+    part <- toSubs recs
+    tell $ "SET " ++ part ++ " "
+    where
+        toSub (c,_) = return $ c ++ " = ?"
+        toSubs [r] = toSub r
+        toSubs (r:rs) = do
+            part1 <- toSub r
+            part2 <- toSubs rs
+            return $ part1 ++ "," ++ part2
+        toSubs _ = fail "records cannot be empty"
 
-insertBuilder :: Table -> [Column] -> SQL
-insertBuilder table cols = sql
-    where sql = "INSERT INTO " ++ table ++ " (" ++
-                toStrs cols ++
-                ") "
-          toStrs [c] = c
-          toStrs (c:cs) = c ++ "," ++ toStrs cs
+delete :: MonadFail m => Table -> SQLDSL m
+delete table = do
+    validateTable table
+    tell $ "DELETE FROM " ++ table ++ " "
 
-values :: [SqlValue] -> SQLDSL
-values vals = tell $ valuesBuilder vals
+createDatabase :: MonadFail m => Database -> SQLDSL m
+createDatabase db = do
+    validateDatabase db
+    tell $ "CREATE DATABASE " ++ db ++ " "
 
-valuesBuilder :: [SqlValue] -> SQL
-valuesBuilder vals = sql
-    where sql = "VALUES (" ++ toPhs vals ++ ") "
-          toPhs [_] = "?"
-          toPhs (_:vs) = "?," ++ toPhs vs
-
-update :: Table -> SQLDSL
-update table = tell $ updateBuilder table
-
-updateBuilder :: Table -> SQL
-updateBuilder table = "UPDATE " ++ table ++ " "
-
-set :: [Record] -> SQLDSL
-set recs = tell $ setBuilder recs
-
-setBuilder :: [Record] -> SQL
-setBuilder recs = sql
-    where sql = "SET " ++ toSubs recs ++ " "
-          toSub (c,_) = c ++ " = ?"
-          toSubs [r] = toSub r
-          toSubs (r:rs) = toSub r ++ "," ++ toSubs rs
-
-delete :: Table -> SQLDSL
-delete table = tell $ deleteBuilder table
-
-deleteBuilder :: Table -> SQL
-deleteBuilder table = "DELETE FROM " ++ table ++ " "
-
-createDatabase :: Database -> SQLDSL
-createDatabase db = tell $ createDatabaseBuilder db
-
-createDatabaseBuilder :: Database -> SQL
-createDatabaseBuilder db = "CREATE DATABASE " ++ db ++ " "
-
-createTable :: Table -> [Definition] -> SQLDSL
-createTable table defs = tell $ createTableBuilder table defs
-
-createTableBuilder :: Table -> [Definition] -> SQL
-createTableBuilder table defs = sql
-    where sql = "CREATE TABLE " ++ table ++ " (" ++
-                toDefs defs ++
-                ") "
-          toDef (c,t) = c ++ " " ++ t
-          toDefs [d] = toDef d
-          toDefs (d:ds) = toDef d ++ "," ++ toDefs ds
+createTable :: MonadFail m => Table -> [Definition] -> SQLDSL m
+createTable table defs = do
+    validateTable table
+    part <- toDefs defs
+    tell $ "CREATE TABLE " ++ table ++ " (" ++
+            part ++
+            ") "
+    where
+        toDef (c,t) = return $ c ++ " " ++ t
+        toDefs [d] = toDef d
+        toDefs (d:ds) = do
+            part1 <- toDef d
+            part2 <- toDefs ds
+            return $ part1 ++ "," ++ part2
+        toDefs _ = fail "definitions cannot be empty"
 
 runSelect :: IConnection conn => Table -> [Column] -> Condition-> Runtime conn [[Record]]
-runSelect table cols cond@(_,cvals) = runQuery sql cvals cols
-    where sql = buildSQL $ do
-                    select cols
-                    from table
-                    where_ cond
+runSelect table cols cond@(_,cvals) conn = do
+    sql <- buildSQL $ do
+                select cols
+                from table
+                where_ cond
+    runQuery sql cvals cols conn
 
 runInsert :: IConnection conn => Table -> [Record] -> Runtime conn Integer
-runInsert table recs = runSQL sql vals
-    where sql = buildSQL $ do
-                    insert table cols
-                    values vals
+runInsert table recs conn = do
+    sql <- buildSQL $ do
+                insert table cols
+                values vals
+    runSQL sql vals conn
+    where
           (cols, vals) = unzip recs
 
 runUpdate :: IConnection conn => Table -> [Record] -> Condition -> Runtime conn Integer
-runUpdate table recs cond@(_,cvals) = runSQL sql (vals <> cvals)
-    where sql = buildSQL $ do
-                    update table
-                    set recs
-                    where_ cond
+runUpdate table recs cond@(_,cvals) conn = do
+    sql <- buildSQL $ do
+                update table
+                set recs
+                where_ cond
+    runSQL sql (vals <> cvals) conn
+    where
           (_, vals) = unzip recs
 
 runDelete :: IConnection conn => Table -> Condition -> Runtime conn Integer
-runDelete table cond@(_,cvals) = runSQL sql cvals
-    where sql = buildSQL $ do
-                    delete table
-                    where_ cond
+runDelete table cond@(_,cvals) conn = do
+    sql <- buildSQL $ do
+                delete table
+                where_ cond
+    runSQL sql cvals conn
