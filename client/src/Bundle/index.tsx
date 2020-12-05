@@ -1,9 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import { Row } from 'Lib/Row'
-import { Link } from 'Lib/Link'
-
 import { Uploader } from 'Bundle/Uploader'
 
 const Main = (
