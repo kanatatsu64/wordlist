@@ -6,8 +6,8 @@ type PropsType = { }
 
 export const ListItem: React.FC<PropsType> = props => {
     return (
-        <div className={ style.item }>
+        <li className={ style.item }>
             { props.children }
-        </div>
+        </li>
     )
 }

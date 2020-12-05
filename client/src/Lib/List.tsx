@@ -1,24 +1,21 @@
-import React from 'react'
-import style from './ListStyle.scss'
+import React, { ReactElement } from 'react'
+
+import style from 'Lib/ListStyle.scss'
+import { Sequence } from 'Lib/Sequence'
 
 type PropsType = {
-    records: {
-        item: React.ReactElement,
-        key: React.ReactText
-    }[]
+    count?: number
+    children: ReactElement[]
 }
 
 export const List: React.FC<PropsType> = props => {
-    const { records } = props
+    const { count } = props
 
     return (
         <ul className={ style.list }>
-            {records.map(record => {
-                const { item, key } = record
-                return (
-                    <li className={ style.item } key={ key }>{ item }</li>
-                )
-            })}
+            <Sequence count={ count }>
+                { props.children }
+            </Sequence>
         </ul>
     )
 }
