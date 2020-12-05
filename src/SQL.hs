@@ -23,6 +23,7 @@ module SQL (
     Record,
     ISchema (..),
     SQLDSL,
+    lookup,
     buildSQL,
     nop,
     select,
@@ -36,11 +37,15 @@ module SQL (
     createDatabase,
     createTable,
     runSelect,
+    runSelectAll,
     runInsert,
     runUpdate,
     runDelete,
     module Database.HDBC
 ) where
+
+import Prelude hiding ( lookup )
+import qualified Prelude
 
 import Control.Monad.Cont
 import Control.Monad.Writer
@@ -107,6 +112,9 @@ class ISchema a where
     columns :: a -> [Column]
     toRecords :: a -> [Record]
     fromRecords :: [Record] -> Maybe a
+
+lookup :: Convertible SqlValue a => Column -> [Record] -> Maybe a
+lookup col recs = maybeFromSql =<< Prelude.lookup col recs
 
 type SQLDSL m = WriterT SQL m ()
 
@@ -232,6 +240,13 @@ runSelect table cols cond@(_,cvals) conn = do
                 from table
                 where_ cond
     runQuery sql cvals cols conn
+
+runSelectAll :: IConnection conn => Table -> [Column] -> Runtime conn [[Record]]
+runSelectAll table cols conn = do
+    sql <- buildSQL $ do
+                select cols
+                from table
+    runQuery sql [] cols conn
 
 runInsert :: IConnection conn => Table -> [Record] -> Runtime conn Integer
 runInsert table recs conn = do
