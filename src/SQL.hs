@@ -8,8 +8,10 @@ module SQL (
     contConnection,
     contTransaction,
     existTable,
+    runExistTable,
     maybeFromSql,
     Runtime,
+    getConn,
     execRuntime,
     runSQL,
     runQuery,
@@ -23,6 +25,7 @@ module SQL (
     Record,
     ISchema (..),
     SQLDSL,
+    columns,
     lookup,
     buildSQL,
     nop,
@@ -41,6 +44,8 @@ module SQL (
     runInsert,
     runUpdate,
     runDelete,
+    runCreateDatabase,
+    runCreateTable,
     module Database.HDBC
 ) where
 
@@ -48,6 +53,7 @@ import Prelude hiding ( lookup )
 import qualified Prelude
 
 import Control.Monad.Cont
+import Control.Monad.Reader
 import Control.Monad.Writer
 import Database.HDBC
 import Data.Convertible ( Convertible )
@@ -56,7 +62,7 @@ import Database.HDBC.Sqlite3 ( connectSqlite3, Connection )
 import Utils ( execCont )
 
 database :: Database
-database = "resource/database"
+database = "resource/database.db"
 
 connect :: FilePath -> IO Connection
 connect = connectSqlite3
@@ -82,21 +88,36 @@ maybeFromSql sval = case safeFromSql sval of
                       Left _ -> Nothing
                       Right val -> val
 
-type Runtime c a = c -> IO a
+type Runtime c a = ReaderT c IO a
+
+toRuntime :: (c -> IO a) -> Runtime c a
+toRuntime = ReaderT
+
+getConn :: IConnection conn => Runtime conn conn
+getConn = ask
 
 execRuntime :: (forall c. IConnection c => Runtime c a) -> IO a
 execRuntime runtime = execCont do
     conn <- contConnection database
     trans <- contTransaction conn
-    return $ runtime trans
+    return $ runReaderT runtime trans
 
 runSQL :: IConnection conn => SQL -> [SqlValue] -> Runtime conn Integer
-runSQL sql vals conn = run conn sql vals
+runSQL sql vals = toRuntime $ go sql vals
+    where
+        go sql vals conn = run conn sql vals
 
 runQuery :: IConnection conn => SQL -> [SqlValue] -> [Column] -> Runtime conn [[Record]]
-runQuery sql vals cols conn = do
-    rows <- quickQuery conn sql vals
-    return $ zip cols <$> rows
+runQuery sql vals cols = toRuntime $ go sql vals cols
+    where
+        go sql vals cols conn = do
+            rows <- quickQuery conn sql vals
+            return $ zip cols <$> rows
+
+runExistTable :: IConnection conn => Table -> Runtime conn Bool
+runExistTable table = do
+    conn <- getConn
+    liftIO $ existTable conn table
 
 type SQL = String
 type Database = String
@@ -109,9 +130,13 @@ type Definition = (Column, DataType)
 type Record = (Column, SqlValue)
 
 class ISchema a where
-    columns :: a -> [Column]
+    table :: a -> Table
+    definitions :: a -> [Definition]
     toRecords :: a -> [Record]
     fromRecords :: [Record] -> Maybe a
+
+columns :: ISchema a => a -> [Column]
+columns schema = map fst (definitions schema)
 
 lookup :: Convertible SqlValue a => Column -> [Record] -> Maybe a
 lookup col recs = maybeFromSql =<< Prelude.lookup col recs
@@ -120,8 +145,8 @@ type SQLDSL m = WriterT SQL m ()
 
 buildSQL :: MonadFail m => SQLDSL m -> m SQL
 buildSQL dsl = do
-        sql <- execWriterT dsl
-        return $ sql ++ ";"
+    sql <- execWriterT dsl
+    return $ sql ++ ";"
 
 validateTable :: MonadFail m => Table -> m ()
 validateTable table =
@@ -234,42 +259,52 @@ createTable table defs = do
         toDefs _ = fail "definitions cannot be empty"
 
 runSelect :: IConnection conn => Table -> [Column] -> Condition-> Runtime conn [[Record]]
-runSelect table cols cond@(_,cvals) conn = do
+runSelect table cols cond@(_,cvals) = do
     sql <- buildSQL $ do
                 select cols
                 from table
                 where_ cond
-    runQuery sql cvals cols conn
+    runQuery sql cvals cols
 
 runSelectAll :: IConnection conn => Table -> [Column] -> Runtime conn [[Record]]
-runSelectAll table cols conn = do
+runSelectAll table cols = do
     sql <- buildSQL $ do
                 select cols
                 from table
-    runQuery sql [] cols conn
+    runQuery sql [] cols
 
 runInsert :: IConnection conn => Table -> [Record] -> Runtime conn Integer
-runInsert table recs conn = do
+runInsert table recs = do
     sql <- buildSQL $ do
                 insert table cols
                 values vals
-    runSQL sql vals conn
+    runSQL sql vals
     where
           (cols, vals) = unzip recs
 
 runUpdate :: IConnection conn => Table -> [Record] -> Condition -> Runtime conn Integer
-runUpdate table recs cond@(_,cvals) conn = do
+runUpdate table recs cond@(_,cvals) = do
     sql <- buildSQL $ do
                 update table
                 set recs
                 where_ cond
-    runSQL sql (vals <> cvals) conn
+    runSQL sql (vals <> cvals)
     where
           (_, vals) = unzip recs
 
 runDelete :: IConnection conn => Table -> Condition -> Runtime conn Integer
-runDelete table cond@(_,cvals) conn = do
+runDelete table cond@(_,cvals) = do
     sql <- buildSQL $ do
                 delete table
                 where_ cond
-    runSQL sql cvals conn
+    runSQL sql cvals
+
+runCreateDatabase :: IConnection conn => Database -> Runtime conn Integer
+runCreateDatabase database = do
+    sql <- buildSQL $ createDatabase database
+    runSQL sql []
+
+runCreateTable :: IConnection conn => Table -> [Definition] -> Runtime conn Integer
+runCreateTable table defs = do
+    sql <- buildSQL $ createTable table defs
+    runSQL sql []
