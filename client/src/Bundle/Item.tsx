@@ -1,24 +1,25 @@
 import React from 'react'
 
 import style from './ItemStyle.scss'
+import { BundleInfo } from 'Types'
 import { Delete } from 'Lib/Icon'
 
 type PropsType = {
-    name: String,
-    onSelect: (name: String) => void,
-    onDelete: (name: String) => void
+    bundleInfo: BundleInfo,
+    onSelect: (bundleInfo: BundleInfo) => void,
+    onDelete: (bundleInfo: BundleInfo) => void
 }
 
 export const Item: React.FC<PropsType> = props => {
-    const { name } = props
+    const { bundleInfo } = props
 
-    const onDelete = () => props.onDelete(name)
-    const onSelect = () => props.onSelect(name)
+    const onDelete = () => props.onDelete(bundleInfo)
+    const onSelect = () => props.onSelect(bundleInfo)
 
     return (
         <div className={ style.item } onClick={ onSelect }>
             <div className={ style.name }>
-                <span>{ name }</span>
+                <span>{ bundleInfo.name }</span>
             </div>
             <div className={ style.control }>
                 <Delete onClick={ onDelete }></Delete>

@@ -1,17 +1,19 @@
-import React from 'react'
+import React, { ReactElement } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 
 import { Bundle, Card } from 'Types'
-import { getByName } from 'Api/Bundle'
+import { load } from 'Api/Bundle'
 import { Center } from 'Lib/Align'
 import { Sequence } from 'Lib/Sequence'
 import { Dial } from 'Lib/Dial'
 import { mod } from 'Utils'
 
-type PropsType = { }
+type PropsType = {
+    setMenu: (menu: ReactElement) => void
+}
 
 export const BundleTablePage: React.FC<PropsType> = props => {
-    const { name } = useParams()
+    const { bundleId } = useParams()
 
     const history = useHistory()
     const [bundle, setBundle] = React.useState<Bundle>(undefined)
@@ -20,7 +22,7 @@ export const BundleTablePage: React.FC<PropsType> = props => {
 
     React.useEffect(() => {
         (async () => {
-            setBundle(await getByName(name))
+            setBundle(await load(bundleId))
         })()
     }, [name])
 
@@ -66,11 +68,16 @@ export const BundleTablePage: React.FC<PropsType> = props => {
 
     return (
         <>
-            <Center>
-                <h1>{ name }</h1>
-                <button onClick={ onStartLearning }>Start Learning</button>
-            </Center>
-            {!!cards ? viewCards(cards) : loading}
+            {!!bundle ? (
+                <>
+                    <Center>
+                        <h1>{ bundle.name }</h1>
+                        <button onClick={ onStartLearning }>Start Learning</button>
+                    </Center>
+                    { viewCards(cards) }
+                </>
+            ): loading
+            }
         </>
     )
 }
