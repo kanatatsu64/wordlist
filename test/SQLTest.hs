@@ -49,7 +49,57 @@ test_all = testGroup "SQL" [
         test_createTable
     ]
 
-test_buildSQL = testGroup "buildSQL" []
+test_buildSQL = testGroup "buildSQL" [
+        test_buildSQL1,
+        test_buildSQL2,
+        test_buildSQL3,
+        test_buildSQL4
+    ]
+    where
+        test_buildSQL1 = testCase "buildSQL 1" do
+            let dsl = do
+                    select ["col1", "col2"]
+                    from "Table"
+                    where_ ("id = ?", [toSql @Integer 100])
+                expected = return @Maybe (
+                        "SELECT col1,col2 " ++
+                        "FROM Table " ++
+                        "WHERE id = ? ;"
+                    )
+                actual = buildSQL dsl
+            assertEqual "select statement" expected actual
+        test_buildSQL2 = testCase "buildSQL 2" do
+            let dsl = do
+                    insert "Table" ["col1", "col2"]
+                    values [toSql @Integer 100, toSql "test"]
+                expected = return @Maybe (
+                        "INSERT INTO Table (col1,col2) " ++
+                        "VALUES (?,?) ;"
+                    )
+                actual = buildSQL dsl
+            assertEqual "insert statement" expected actual
+        test_buildSQL3 = testCase "buildSQL3" do
+            let dsl = do
+                    update "Table"
+                    set [("col1", toSql @Integer 100), ("col2", toSql "test")]
+                    where_ ("id = ?", [toSql True])
+                expected = return @Maybe (
+                        "UPDATE Table " ++
+                        "SET col1 = ?,col2 = ? " ++
+                        "WHERE id = ? ;"
+                    )
+                actual = buildSQL dsl
+            assertEqual "update statement" expected actual
+        test_buildSQL4 = testCase "buildSQL 4" do
+            let dsl = do
+                    delete "Table"
+                    where_ ("id = ?", [toSql @Integer 100])
+                expected = return @Maybe (
+                        "DELETE FROM Table " ++
+                        "WHERE id = ? ;"
+                    )
+                actual = buildSQL dsl
+            assertEqual "delete statement" expected actual
 
 test_nop = testGroup "nop" [
         test_nop1,
