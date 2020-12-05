@@ -8,8 +8,13 @@ type PropsType = {}
 
 export const Header: React.FC<PropsType> = props => (
     <div className={ style.header }>
-        <Link to="/">
-            <Home></Home>
-        </Link>
+        <div className={ style.logo }>
+            <Link to="/">
+                <Home></Home>
+            </Link>
+        </div>
+        <div className={ style.menu }>
+            { props.children }
+        </div>
     </div>
 )

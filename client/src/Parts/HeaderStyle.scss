@@ -1,5 +1,28 @@
 @import "Lib/_colors";
 
+$height: 45px;
+
 .header {
     background-color: $hback;
+    height: $height;
+    & .logo {
+        float: left;
+        height: $height;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    & .menu {
+        float: right;
+        height: $height;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        color: white;
+    }
+    &::after {
+        clear: both;
+    }
 }
