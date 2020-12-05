@@ -4,6 +4,9 @@ import { useHistory, useParams } from 'react-router-dom'
 import { Bundle, Card } from 'Types'
 import { getByName } from 'Api/Bundle'
 import { Center } from 'Lib/Align'
+import { Sequence } from 'Lib/Sequence'
+import { Dial } from 'Lib/Dial'
+import { mod } from 'Utils'
 
 type PropsType = { }
 
@@ -12,6 +15,7 @@ export const BundleTablePage: React.FC<PropsType> = props => {
 
     const history = useHistory()
     const [bundle, setBundle] = React.useState<Bundle>(undefined)
+    const [from, setFrom] = React.useState(0)
     const cards = bundle?.cards
 
     React.useEffect(() => {
@@ -24,23 +28,33 @@ export const BundleTablePage: React.FC<PropsType> = props => {
         history.push(`/bundle/learn/${ name }`)
     }
 
-    const viewCards = (cards: Card[]) => (
-        <table>
-            <tbody>
-            { cards.map(viewCard) }
-            </tbody>
-        </table>
-    )
-
-    const viewCard = (card: Card) => {
-        const { word, meaning, cardid } = card
-        return (
-            <tr key={ cardid }>
-                <td><Center>{ word }</Center></td>
-                <td><Center>{ meaning }</Center></td>
-            </tr>
-        )
+    const onNext = () => {
+        setFrom(mod(from + 1, cards.length))
     }
+
+    const onPrev = () => {
+        setFrom(mod(from - 1, cards.length))
+    }
+
+    const viewCards = (cards: Card[]) => (
+        <Dial onNext={ onNext } onPrev={ onPrev }>
+            <table>
+                <tbody>
+                    <Sequence from={ from } count={ 3 }>
+                        {cards.map(card => {
+                            const { word, meaning, cardid } = card
+                            return (
+                                <tr key={ cardid }>
+                                    <td><Center>{ word }</Center></td>
+                                    <td><Center>{ meaning }</Center></td>
+                                </tr>
+                            )
+                        })}
+                    </Sequence>
+                </tbody>
+            </table>
+        </Dial>
+    )
 
     const loading = (
         <div>
@@ -54,7 +68,7 @@ export const BundleTablePage: React.FC<PropsType> = props => {
                 <h1>{ name }</h1>
                 <button onClick={ onStartLearning }>Start Learning</button>
             </Center>
-            { !!cards ? viewCards(cards) : loading }
+            {!!cards ? viewCards(cards) : loading}
         </>
     )
 }
