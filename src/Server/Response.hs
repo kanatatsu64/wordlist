@@ -43,8 +43,7 @@ json str = return $ responseLBS status200 [(hContentType, "application/json")] $
 uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Request -> IO Response
 uploader callback request = do
     (_, files) <- parseRequestBody lbsBackEnd request
-    let ios = map callback files
-    foldl (>>) (return ()) ios
+    mapM_ callback files
     ok
 
 ok :: IO Response
