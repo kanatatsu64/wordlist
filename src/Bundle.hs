@@ -2,12 +2,16 @@
 
 module Bundle (
     Bundle (..),
+    BundleInfo,
     runSave,
     runLoad,
+    runLoadInfos,
     save,
-    load
+    load,
+    loadInfos
 ) where
 
+import Prelude hiding ( lookup )
 import Control.Monad
 
 import Html ( Htmlizable (..), TagName (..), Content (..) )
@@ -23,11 +27,12 @@ import SQL (
         ISchema (..),
         Table,
         Runtime,
+        lookup,
         execRuntime,
         toSql,
-        maybeFromSql,
         runInsert,
-        runSelect
+        runSelect,
+        runSelectAll
     )
 
 data Bundle = Bundle {
@@ -61,11 +66,10 @@ instance ISchema BundleSchema where
             ("desc", toSql $ bs_desc schema)
         ]
     fromRecords recs = do
-            _bundleid <- compose =<< get "id" recs
-            _name <- get "name" recs
-            _desc <- get "desc" recs
+            _bundleid <- compose =<< lookup "id" recs
+            _name <- lookup "name" recs
+            _desc <- lookup "desc" recs
             return $ BundleSchema _bundleid _name _desc
-        where get key recs = maybeFromSql =<< lookup key recs
 
 toBundleSchema :: Bundle -> BundleSchema
 toBundleSchema bundle = BundleSchema _bundleid _name _desc
@@ -88,10 +92,9 @@ instance ISchema BundleToCardSchema where
             ("cardid", toSql $ serialize $ bcs_cardid schema)
         ]
     fromRecords recs = do
-            _bundleid <- compose =<< get "bundleid" recs
-            _cardid <- compose =<< get "cardid" recs
+            _bundleid <- compose =<< lookup "bundleid" recs
+            _cardid <- compose =<< lookup "cardid" recs
             return $ BundleToCardSchema _bundleid _cardid
-        where get key recs = maybeFromSql =<< lookup key recs
 
 toBundleToCardSchemas :: Bundle -> [BundleToCardSchema]
 toBundleToCardSchemas bundle = do
@@ -150,6 +153,19 @@ runLoad _bundleid conn = do
 
 load :: BundleID -> IO Bundle
 load _bundleid = execRuntime $ runLoad _bundleid
+
+type BundleInfo = (BundleID, String)
+
+runLoadInfos :: IConnection conn => Runtime conn [BundleInfo]
+runLoadInfos conn = do
+        recss <- runSelectAll bundleTable ["id", "name"] conn
+        forM recss $ \recs -> do
+            id <- maybeToFail "id is not found" $ compose =<< lookup "id" recs
+            name <- maybeToFail "name is not found" $ lookup "name" recs
+            return (id, name)
+
+loadInfos :: IO [BundleInfo]
+loadInfos = execRuntime runLoadInfos
 
 {-
     Bundle "german" "from textbook" [..]
