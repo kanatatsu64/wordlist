@@ -3,12 +3,20 @@
 module Bundle (
     Bundle (..),
     BundleInfo,
+    BundleSchema,
+    BundleToCardSchema,
+    bundleTable,
+    bundleToCardTable,
     runSave,
     runLoad,
     runLoadInfos,
+    runAddCard,
+    runAddCards,
     save,
     load,
-    loadInfos
+    loadInfos,
+    addCard,
+    addCards
 ) where
 
 import Prelude hiding ( lookup )
@@ -27,6 +35,7 @@ import SQL (
         ISchema (..),
         Table,
         Runtime,
+        columns,
         lookup,
         execRuntime,
         toSql,
@@ -55,10 +64,11 @@ data BundleSchema = BundleSchema {
 }
 
 instance ISchema BundleSchema where
-    columns = const [
-            "id",
-            "name",
-            "desc"
+    table = const bundleTable
+    definitions = const [
+            ("id", "String"),
+            ("name", "String"),
+            ("desc", "String")
         ]
     toRecords schema = [
             ("id", toSql $ serialize $ bs_bundleid schema),
@@ -83,9 +93,10 @@ data BundleToCardSchema = BundleToCardSchema {
 }
 
 instance ISchema BundleToCardSchema where
-    columns = const [
-            "bundleid",
-            "cardid"
+    table = const bundleToCardTable
+    definitions = const [
+            ("bundleid", "String"),
+            ("cardid", "String")
         ]
     toRecords schema = [
             ("bundleid", toSql $ serialize $ bcs_bundleid schema),
@@ -117,26 +128,26 @@ fromSchemas bundleSchema bundleToCardSchemas cards = do
     return $ Bundle _bundleid _name _desc cards
 
 runSave :: IConnection conn => Bundle -> Runtime conn ()
-runSave bundle conn = do
+runSave bundle = do
         let bundleSchema = toBundleSchema bundle
             bundleToCardSchemas = toBundleToCardSchemas bundle
-        runInsert bundleTable (toRecords bundleSchema) conn
+        runInsert bundleTable (toRecords bundleSchema)
         sequence_ do
             schema <- bundleToCardSchemas
-            return $ runInsert bundleToCardTable (toRecords schema) conn
+            return $ runInsert bundleToCardTable (toRecords schema)
         sequence_ do
             card <- cards bundle
-            return $ Card.runSave card conn
+            return $ Card.runSave card
 
 save :: Bundle -> IO ()
 save bundle = execRuntime $ runSave bundle
 
 runLoad :: IConnection conn => BundleID -> Runtime conn Bundle
-runLoad _bundleid conn = do
+runLoad _bundleid = do
         let val = toSql $ serialize _bundleid
-        brs <- runSelect bundleTable (columns @BundleSchema undefined) ("id = ?", [val]) conn
+        brs <- runSelect bundleTable (columns @BundleSchema undefined) ("id = ?", [val])
         bss <- mapM (maybeToFail "failed to parse Bundle Table" . fromRecords) brs
-        bcrs <- runSelect bundleToCardTable (columns @BundleToCardSchema undefined) ("id = ?", [val]) conn
+        bcrs <- runSelect bundleToCardTable (columns @BundleToCardSchema undefined) ("bundleid = ?", [val])
         bcss <- mapM (maybeToFail "failed to parse BundleToCard Table" . fromRecords) bcrs
         bundles <- sequence do
             bs <- bss
@@ -144,7 +155,7 @@ runLoad _bundleid conn = do
                 _cards <- sequence do
                     bcs <- bcss
                     let _cardid = bcs_cardid bcs
-                    return $ Card.runLoad _cardid conn
+                    return $ Card.runLoad _cardid
                 maybeToFail "failed to compose Bundle" $ fromSchemas bs bcss _cards
         case length bundles of
             1 -> return $ head bundles
@@ -154,18 +165,36 @@ runLoad _bundleid conn = do
 load :: BundleID -> IO Bundle
 load _bundleid = execRuntime $ runLoad _bundleid
 
-type BundleInfo = (BundleID, String)
+type BundleInfo = (BundleID, String, String)
 
 runLoadInfos :: IConnection conn => Runtime conn [BundleInfo]
-runLoadInfos conn = do
-        recss <- runSelectAll bundleTable ["id", "name"] conn
+runLoadInfos = do
+        recss <- runSelectAll bundleTable ["id", "name", "desc"]
         forM recss $ \recs -> do
             id <- maybeToFail "id is not found" $ compose =<< lookup "id" recs
             name <- maybeToFail "name is not found" $ lookup "name" recs
-            return (id, name)
+            desc <- maybeToFail "desc is not found" $ lookup "desc" recs
+            return (id, name, desc)
 
 loadInfos :: IO [BundleInfo]
 loadInfos = execRuntime runLoadInfos
+
+runAddCard :: IConnection conn => Bundle -> CardID -> Runtime conn ()
+runAddCard bundle _cardid = do
+        let _bundleid = bundleid bundle
+            schema = BundleToCardSchema _bundleid _cardid
+        void $ runInsert bundleToCardTable (toRecords schema)
+
+runAddCards :: IConnection conn => Bundle -> [CardID] -> Runtime conn ()
+runAddCards bundle _cardids = sequence_ do
+        _cardid <- _cardids
+        return $ runAddCard bundle _cardid
+
+addCard :: Bundle -> CardID -> IO ()
+addCard bundle _cardid = execRuntime $ runAddCard bundle _cardid
+
+addCards :: Bundle -> [CardID] -> IO ()
+addCards bundle _cardids = execRuntime $ runAddCards bundle _cardids
 
 {-
     Bundle "german" "from textbook" [..]

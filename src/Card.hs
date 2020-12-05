@@ -6,6 +6,9 @@ module Card (
     Language (..),
     Note,
     Example (..),
+    CardSchema,
+    AttrSchema,
+    ExampleSchema,
     cardTable,
     attrTable,
     exampleTable,
@@ -28,6 +31,7 @@ import SQL (
         execRuntime,
         Runtime,
         Table,
+        columns,
         lookup,
         toSql,
         runInsert,
@@ -54,7 +58,7 @@ attrTable :: Table
 attrTable = "Attr"
 
 exampleTable :: Table
-exampleTable = "Table"
+exampleTable = "Example"
 
 data CardSchema = CardSchema {
     cs_cardid :: CardID,
@@ -66,13 +70,14 @@ data CardSchema = CardSchema {
 }
 
 instance ISchema CardSchema where
-    columns = const [
-            "id",
-            "pluginid",
-            "language",
-            "word",
-            "meaning",
-            "note"
+    table = const cardTable
+    definitions = const [
+            ("id", "String"),
+            ("pluginid", "String"),
+            ("language", "String"),
+            ("word", "String"),
+            ("meaning", "String"),
+            ("note", "String")
         ]
     toRecords schema = [
             ("id", toSql $ serialize $ cs_cardid schema),
@@ -107,10 +112,11 @@ data AttrSchema = AttrSchema {
 }
 
 instance ISchema AttrSchema where
-    columns = const [
-            "cardid",
-            "seq",
-            "attr"
+    table = const attrTable
+    definitions = const [
+            ("cardid", "String"),
+            ("seq", "String"),
+            ("attr", "String")
         ]
     toRecords schema = [
             ("cardid", toSql $ serialize $ as_cardid schema),
@@ -137,10 +143,11 @@ data ExampleSchema = ExampleSchema {
 }
 
 instance ISchema ExampleSchema where
-    columns = const [
-            "cardid",
-            "original",
-            "translation"
+    table = const exampleTable
+    definitions = const [
+            ("cardid", "String"),
+            ("original", "String"),
+            ("translation", "String")
         ]
     toRecords schema = [
             ("cardid", toSql $ serialize $ es_cardid schema),
@@ -180,32 +187,32 @@ fromSchemas cardSchema attrSchemas exampleSchemas = do
     return $ Card _cardid _pluginid _language _word _meaning _attrs _note _examples
 
 runSave :: IConnection conn => Card -> Runtime conn ()
-runSave card conn = do
+runSave card = do
         let cardSchema = toCardSchema card
             attrSchemas = toAttrSchemas card
             exampleSchemas = toExampleSchemas card
-        runInsert cardTable (toRecords cardSchema) conn
+        runInsert cardTable (toRecords cardSchema)
         sequence_ do
             schema <- attrSchemas
-            return $ runInsert attrTable (toRecords schema) conn
+            return $ runInsert attrTable (toRecords schema)
         sequence_ do
             schema <- exampleSchemas
-            return $ runInsert exampleTable (toRecords schema) conn
+            return $ runInsert exampleTable (toRecords schema)
 
 save :: Card -> IO ()
 save card = execRuntime $ runSave card
 
 runLoad :: IConnection conn => CardID -> Runtime conn Card
-runLoad _cardid conn = do
+runLoad _cardid = do
         let val = toSql $ serialize _cardid
-        crs <- runSelect cardTable (columns @CardSchema undefined) ("id = ?", [val]) conn
+        crs <- runSelect cardTable (columns @CardSchema undefined) ("id = ?", [val])
         css <- mapM (maybeToFail "failed to parse Card table" . fromRecords) crs
         cards <- sequence do
             cs <- css
             return do
-                ars <- runSelect attrTable (columns @AttrSchema undefined) ("cardid = ?", [val]) conn
+                ars <- runSelect attrTable (columns @AttrSchema undefined) ("cardid = ?", [val])
                 ass <- mapM (maybeToFail "failed to parse Attr table" . fromRecords) ars
-                ers <- runSelect exampleTable (columns @ExampleSchema undefined) ("cardid = ?", [val]) conn
+                ers <- runSelect exampleTable (columns @ExampleSchema undefined) ("cardid = ?", [val])
                 ess <- mapM (maybeToFail "failed to parse Example table" . fromRecords) ers
                 maybeToFail "failed to compose Card" $ fromSchemas cs ass ess
         case length cards of
