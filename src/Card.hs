@@ -15,6 +15,7 @@ module Card (
     load
 ) where
 
+import Prelude hiding ( lookup )
 import Control.Monad
 import Data.Sort ( sortOn )
 
@@ -27,8 +28,8 @@ import SQL (
         execRuntime,
         Runtime,
         Table,
+        lookup,
         toSql,
-        maybeFromSql,
         runInsert,
         runSelect
     )
@@ -82,14 +83,13 @@ instance ISchema CardSchema where
             ("note", toSql $ cs_note schema)
         ]
     fromRecords recs = do
-            _cardid <- compose =<< get "id" recs
-            _pluginid <- compose =<< get "pluginid" recs
-            _language <- compose =<< get "language" recs
-            _word <- get "word" recs
-            _meaning <- get "meaning" recs
-            _note <- get "note" recs
+            _cardid <- compose =<< lookup "id" recs
+            _pluginid <- compose =<< lookup "pluginid" recs
+            _language <- compose =<< lookup "language" recs
+            _word <- lookup "word" recs
+            _meaning <- lookup "meaning" recs
+            _note <- lookup "note" recs
             return $ CardSchema _cardid _pluginid _language _word _meaning _note
-        where get key recs = maybeFromSql =<< lookup key recs
 
 toCardSchema :: Card -> CardSchema
 toCardSchema card = CardSchema _cardid _pluginid _language _word _meaning _note
@@ -118,11 +118,10 @@ instance ISchema AttrSchema where
             ("attr", toSql $ serialize $ as_attr schema)
         ]
     fromRecords recs = do
-            _cardid <- compose =<< get "cardid" recs
-            _seq <- get "seq" recs
-            _attr <- compose =<< get "attr" recs
+            _cardid <- compose =<< lookup "cardid" recs
+            _seq <- lookup "seq" recs
+            _attr <- compose =<< lookup "attr" recs
             return $ AttrSchema _cardid _seq _attr
-        where get key recs = maybeFromSql =<< lookup key recs
 
 toAttrSchemas :: Card -> [AttrSchema]
 toAttrSchemas card = do
@@ -149,11 +148,10 @@ instance ISchema ExampleSchema where
             ("translation", toSql $ es_translation schema)
         ]
     fromRecords recs = do
-            _cardid <- compose =<< get "cardid" recs
-            _original <- get "original" recs
-            _translation <- get "translation" recs
+            _cardid <- compose =<< lookup "cardid" recs
+            _original <- lookup "original" recs
+            _translation <- lookup "translation" recs
             return $ ExampleSchema _cardid _original _translation
-        where get key recs = maybeFromSql =<< lookup key recs
 
 toExampleSchemas :: Card -> [ExampleSchema]
 toExampleSchemas card = do
