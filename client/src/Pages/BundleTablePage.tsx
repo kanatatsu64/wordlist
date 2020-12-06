@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
+import Modal from 'react-modal'
 
 import { Bundle, Card } from 'Types'
 import { load } from 'Api/Bundle'
@@ -7,6 +8,7 @@ import { Center } from 'Lib/Align'
 import { Sequence } from 'Lib/Sequence'
 import { Dial } from 'Lib/Dial'
 import { mod } from 'Utils'
+import { UploadForm } from 'Bundle/UploadForm'
 
 type PropsType = {
     setMenu: (menu: ReactElement) => void
@@ -18,16 +20,41 @@ export const BundleTablePage: React.FC<PropsType> = props => {
     const history = useHistory()
     const [bundle, setBundle] = React.useState<Bundle>(undefined)
     const [from, setFrom] = React.useState(0)
+    const [isOpen, setIsOpen] = React.useState(false)
     const cards = bundle?.cards
 
-    React.useEffect(() => {
-        (async () => {
-            setBundle(await load(bundleId))
-        })()
-    }, [name])
-
     const onStartLearning = () => {
-        history.push(`/bundle/learn/${ name }`)
+        history.push(`/bundle/learn/${ bundleId }`)
+    }
+
+    const openModal = () => {
+        setIsOpen(true)
+    }
+    const closeModal = () => {
+        setIsOpen(false)
+    }
+
+    const menu = React.useMemo(() => (
+        <>
+            <button onClick={ onStartLearning }>Start Learning</button>
+            <button onClick={ openModal }>Upload CSV</button>
+        </>
+    ), [])
+
+    const updateBundle = async () => {
+        setBundle(await load(bundleId))
+    }
+
+    React.useEffect(() => {
+        updateBundle()
+    }, [bundleId])
+    React.useEffect(() => {
+        props.setMenu(menu)
+    }, [menu])
+
+    const onUploaded = async () => {
+        closeModal()
+        updateBundle()
     }
 
     const onNext = () => {
@@ -67,17 +94,20 @@ export const BundleTablePage: React.FC<PropsType> = props => {
     )
 
     return (
-        <>
-            {!!bundle ? (
-                <>
-                    <Center>
-                        <h1>{ bundle.name }</h1>
-                        <button onClick={ onStartLearning }>Start Learning</button>
-                    </Center>
-                    { viewCards(cards) }
-                </>
-            ): loading
-            }
-        </>
+        !!bundle ? (
+            <>
+                <Center>
+                    <h1>{ bundle.name }</h1>
+                </Center>
+                { viewCards(cards) }
+                <Modal
+                    isOpen={ isOpen }
+                    onRequestClose={ closeModal }
+                >
+                    <UploadForm bundleId={ bundleId } onUploaded={ onUploaded }></UploadForm>
+                </Modal>
+            </>
+        ): loading
+            
     )
 }
