@@ -16,6 +16,7 @@ module Server.Types (
     Path,
     Body,
     Param,
+    queryToParams,
     buildPath,
     isRoot,
     isAbsolute,
@@ -28,6 +29,7 @@ module Server.Types (
 
 import Prelude hiding ( lookup )
 
+import Network.HTTP.Types ( Query )
 import Data.Text ( Text )
 import qualified Data.Text ( pack, unpack )
 import qualified Data.Text.Lazy ( pack, unpack )
@@ -84,6 +86,9 @@ lookup key ((key', mval'):ps)
     | key == key' = maybeToFail "parameter does not have a value" mval'
     | otherwise = lookup key ps
 lookup key [] = fail $ "parameter is not found: " ++ decode key
+
+queryToParams :: Query -> [Param]
+queryToParams = id
 
 buildPath :: String -> IO Path
 buildPath raw = map Data.Text.pack <$> (validate . shrink) parts
