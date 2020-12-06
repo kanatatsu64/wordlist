@@ -1,5 +1,6 @@
 module Server.Api.Types (
     Language (..),
+    Example (..),
     Card (..),
     Bundle (..),
     convertLanguage,
@@ -15,7 +16,7 @@ import Serializable ( Serializable (..) )
 import Server.Json ( Json (..), Ary (..), Dict (..), Rec (..) )
 import qualified Card ( Card (..) )
 import qualified Bundle ( Bundle (..) )
-import qualified Types ( Language (..) )
+import qualified Types ( Language (..), Example (..) )
 
 data Language = Japanese | English | Chinese | French | German
 
@@ -26,23 +27,38 @@ instance Json Language where
     jsonify French = jsonify "French"
     jsonify German = jsonify "German"
 
+data Example = Example {
+    original :: String,
+    translation :: String
+}
+
+instance Json Example where
+    jsonify (Example original translation) = jsonify $ Dict [
+            Rec "original" original,
+            Rec "translation" translation
+        ]
+
 data Card = Card {
     cardid :: String,
     pluginid :: String,
     language :: Language,
     word :: String,
     meaning :: String,
-    attributes :: [String]
+    attrs :: [String],
+    note :: String,
+    examples :: [Example]
 }
 
 instance Json Card where
-    jsonify (Card cardid pluginid language word meaning attrs) = jsonify $ Dict [
+    jsonify (Card cardid pluginid language word meaning attrs note examples) = jsonify $ Dict [
             Rec "cardid" cardid,
             Rec "pluginid" pluginid,
             Rec "language" language,
             Rec "word" word,
             Rec "meaning" meaning,
-            Rec "attrs" (Ary attrs)
+            Rec "attrs" (Ary attrs),
+            Rec "note" note,
+            Rec "examples" (Ary examples)
         ]
 
 convertLanguage :: Types.Language -> Language
@@ -52,14 +68,19 @@ convertLanguage Types.Chinese =Chinese
 convertLanguage Types.French = French
 convertLanguage Types.German = German
 
+convertExample :: Types.Example -> Example
+convertExample (Types.Example original translation) = Example original translation
+
 convertCard :: Card.Card -> Card
-convertCard card = Card cardid pluginid language word meaning attrs
+convertCard card = Card cardid pluginid language word meaning attrs note examples
     where cardid = UUID.toString $ Card.cardid card
           pluginid = UUID.toString $ Card.pluginid card
           language = convertLanguage $ Card.language card
           word = Card.word card
           meaning = Card.meaning card
           attrs = map serialize $ Card.attrs card
+          note = Card.note card
+          examples = map convertExample $ Card.examples card
 
 data Bundle = Bundle {
     bundleid :: String,
