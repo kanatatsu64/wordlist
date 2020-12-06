@@ -1,20 +1,29 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Plugins.Base (
     getPluginById
 ) where
 
-import Plugin ( PluginID, Plugin )
-import qualified Plugins.German.Base as German
 import Control.Applicative
 
+import Plugin ( PluginID, Plugin (..) )
+import Utils ( maybeToFail )
+import qualified Plugins.German.Base as German
+
+plugins :: MonadFail m => [m Plugin]
+plugins = [
+        German.getPlugin
+    ]
+
 getPluginById :: MonadFail m => PluginID -> m Plugin
-getPluginById = when German.uuid German.getPlugin
-    where when m a x = do
-              y <- m
-              if x == y
-              then a
-              else fail "Plugin is not Found"
+getPluginById = maybeToFail "plugin is not found" . _getPluginById
 
-infixl 3 <||>
-
-(<||>) :: (Applicative f, Alternative m) => f (m a) -> f (m a) -> f (m a)
-(<||>) = liftA2 (<|>)
+_getPluginById :: PluginID -> Maybe Plugin
+_getPluginById _pluginid = foldl (<|>) Nothing do
+    mplugin <- plugins
+    return $ when (pluginid <$> mplugin) mplugin _pluginid
+    where
+        when m a x = do
+            y <- m
+            if x == y
+            then a
+            else Nothing
