@@ -1,13 +1,18 @@
 import axios, { AxiosResponse } from 'axios'
 
-import { Bundle, BundleID, BundleInfo } from 'Types'
+import { Bundle, BundleID, BundleInfo, PluginID } from 'Types'
+import { BaseApiURL } from 'Api/Config'
 
-const BaseURL = 'http://localhost:3000/'
-const BaseApiURL = BaseURL + 'api/'
 const BundleApiURL = BaseApiURL + 'bundle/'
 
 export const create = async (name: string, desc: string) => {
     await axios.post(BundleApiURL, null, { params: { name, desc } })
+}
+
+export const upload = async (bundleId: BundleID, file: File, pluginId: PluginID) => {
+    const data = new FormData()
+    data.append("csv", file)
+    await axios.post(BundleApiURL + bundleId, data, { params: { plugin: pluginId } })
 }
 
 export const load = async (bundleId: BundleID) => {
