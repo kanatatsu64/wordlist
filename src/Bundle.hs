@@ -29,7 +29,7 @@ import qualified Card ( runSave, runLoad )
 import Serializable ( Serializable (..) )
 import Composable ( Composable (..) )
 import Types ( BundleID, CardID )
-import Utils ( same, maybeToFail )
+import Utils ( same, contentEqual, maybeToFail )
 import SQL (
         IConnection,
         ISchema (..),
@@ -114,14 +114,18 @@ toBundleToCardSchemas bundle = do
     let _cardid = cardid card
     return $ BundleToCardSchema _bundleid _cardid
 
-fromSchemas :: BundleSchema -> [BundleToCardSchema] -> [Card] -> Maybe Bundle
+fromSchemas :: MonadFail m => BundleSchema -> [BundleToCardSchema] -> [Card] -> m Bundle
 fromSchemas bundleSchema bundleToCardSchemas cards = do
     let _bs_bundleid = bs_bundleid bundleSchema
         _bcs_bundleids = map bcs_bundleid bundleToCardSchemas
-    guard $ same $ [_bs_bundleid] <> _bcs_bundleids
+    maybeToFail "bundle ids are not consistent" (
+            guard $ same $ [_bs_bundleid] <> _bcs_bundleids
+        )
     let _bcs_cardids = map bcs_cardid bundleToCardSchemas
         _cardids = map cardid cards
-    guard $ same $ _bcs_cardids <> _cardids
+    maybeToFail "card ids are not consistent" (
+            guard $ contentEqual _bcs_cardids _cardids
+        )
     let _bundleid = bs_bundleid bundleSchema
         _name = bs_name bundleSchema
         _desc = bs_desc bundleSchema
@@ -156,7 +160,7 @@ runLoad _bundleid = do
                     bcs <- bcss
                     let _cardid = bcs_cardid bcs
                     return $ Card.runLoad _cardid
-                maybeToFail "failed to compose Bundle" $ fromSchemas bs bcss _cards
+                fromSchemas bs bcss _cards
         case length bundles of
             1 -> return $ head bundles
             0 -> fail "Bundle is not found"

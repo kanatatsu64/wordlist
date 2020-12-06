@@ -167,12 +167,14 @@ toExampleSchemas card = do
     where _cardid = cardid card
           _examples = examples card
 
-fromSchemas :: CardSchema -> [AttrSchema] -> [ExampleSchema] -> Maybe Card
+fromSchemas :: MonadFail m => CardSchema -> [AttrSchema] -> [ExampleSchema] -> m Card
 fromSchemas cardSchema attrSchemas exampleSchemas = do
     let _cs_cardid = cs_cardid cardSchema
         _as_cardids = map as_cardid attrSchemas
         _es_cardids = map es_cardid exampleSchemas
-    guard $ same $ [_cs_cardid] <> _as_cardids <> _es_cardids
+    maybeToFail "card ids are not consistent" (
+            guard $ same $ [_cs_cardid] <> _as_cardids <> _es_cardids
+        )
     let _cardid = cs_cardid cardSchema
         _pluginid = cs_pluginid cardSchema
         _language = cs_language cardSchema
@@ -214,7 +216,7 @@ runLoad _cardid = do
                 ass <- mapM (maybeToFail "failed to parse Attr table" . fromRecords) ars
                 ers <- runSelect exampleTable (columns @ExampleSchema undefined) ("cardid = ?", [val])
                 ess <- mapM (maybeToFail "failed to parse Example table" . fromRecords) ers
-                maybeToFail "failed to compose Card" $ fromSchemas cs ass ess
+                fromSchemas cs ass ess
         case length cards of
             1 -> return $ head cards
             0 -> fail "Card is not found"
