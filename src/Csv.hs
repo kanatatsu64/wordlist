@@ -6,13 +6,14 @@ module Csv (
     trim
 ) where
 
+import Prelude hiding ( lines )
 import System.IO
 import Control.Monad.State
 
 import Card ( Card )
 import Plugin ( Plugin (..) )
 import UUID ( getRandom )
-import Utils ( split, contFile, execCont, for )
+import Utils ( split, contFile, execCont, for, lines )
 
 parseRow :: String -> [String]
 parseRow row = map trim (split ',' row)

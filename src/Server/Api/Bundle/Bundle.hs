@@ -6,7 +6,7 @@ module Server.Api.Bundle.Bundle (
     uploadHandler
 ) where
 
-import Prelude hiding ( lookup )
+import Prelude hiding ( lookup, lines )
 import Network.Wai.Parse ( FileInfo (..) )
 
 import Csv ( parseCsv )
@@ -15,7 +15,7 @@ import Composable ( Composable (..) )
 import SQL ( execRuntime )
 import Plugins.Base ( getPluginById )
 import UUID ( getRandom )
-import Utils ( maybeToFail )
+import Utils ( maybeToFail, lines )
 import qualified Card ( Card (..), runSave )
 import Server.Types ( decode, lazyDecode, lookup )
 import Server.Handler ( handler )
