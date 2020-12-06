@@ -19,7 +19,8 @@ test_split = testGroup "split" [
         test_split1,
         test_split2,
         test_split3,
-        test_split4
+        test_split4,
+        test_split5
     ]
     where
         test_split1 = testCase "split 1" do
@@ -42,3 +43,8 @@ test_split = testGroup "split" [
             let expected = [""]
             let actual = split ',' str
             assertEqual "split empty str" expected actual
+        test_split5 = testCase "split 5" do
+            let str = ","
+            let expected = ["",""]
+            let actual = split ',' str
+            assertEqual "split single delimitor" expected actual
