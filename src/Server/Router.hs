@@ -4,11 +4,10 @@ module Server.Router (
     root
 ) where
 
-import Server.Internal.Router ( Router, responder, get, mount, (~>) )
+import Server.Internal.Router ( responder, get, mount, (~>) )
 import Server.Handler ( sample, static )
 import qualified Server.Api.Router as Api ( router )
 
-router :: Router
 router = do
     get "/" ~> get "/index.html"
     mount "/api" Api.router
