@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2b4f0f00cda614609f587256a11fbb95fe3c044c3db2a4a2e166d8ea570107a0
+-- hash: f10007980c707f1944e311f0b8cdf52b7d4b13d98c48c4208f8cb0ab1c5e87a4
 
 name:           wordlist
 version:        0.1.0.0
@@ -50,6 +50,8 @@ library
       Server.Api.Bundle.Bundle
       Server.Api.Bundle.List
       Server.Api.Bundle.Router
+      Server.Api.Card.Card
+      Server.Api.Card.Router
       Server.Api.Handler
       Server.Api.Plugin.Info
       Server.Api.Plugin.Router
