@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ViewPatterns #-}
+
 module Server.Types (
     ByteString,
     LazyByteString,
@@ -12,7 +15,15 @@ module Server.Types (
     lookup,
     Path,
     Body,
-    Param
+    Param,
+    buildPath,
+    isRoot,
+    isAbsolute,
+    isRelative,
+    toAbsolute,
+    isDirectory,
+    isFile,
+    (</>)
 ) where
 
 import Prelude hiding ( lookup )
@@ -25,7 +36,7 @@ import qualified Data.Text.Lazy.Encoding ( encodeUtf8, decodeUtf8 )
 import Data.ByteString ( ByteString )
 import qualified Data.ByteString.Lazy ( ByteString )
 
-import Utils ( maybeToFail )
+import Utils ( maybeToFail, split, trimLast )
 
 type LazyByteString = Data.ByteString.Lazy.ByteString
 
@@ -73,3 +84,67 @@ lookup key ((key', mval'):ps)
     | key == key' = maybeToFail "parameter does not have a value" mval'
     | otherwise = lookup key ps
 lookup key [] = fail $ "parameter is not found: " ++ decode key
+
+buildPath :: String -> IO Path
+buildPath raw = map Data.Text.pack <$> (validate . shrink) parts
+    where parts = split '/' raw
+          validate [] = return []
+          validate ps@[_] = return ps
+          validate (p:ps) = case p of
+              '*':_ -> fail $ "invalid pattern: " ++ raw
+              _ -> (p:) <$> validate ps
+
+{-
+    (shrink . split '/') "/" = [] (Root, Directory)
+    (shrink . split '/') "/dir//path" = ["", "dir", "path"] (Absolute, File)
+    (shrink . split '/') "/dir//path/" = ["", "dir", "path", ""] (Absolute, Directory)
+    (shrink . split '/') "dir//path" = ["dir", "path"] (Relative, File)
+    (shrink . split '/') "dir/path/" = ["dir", "path", ""] (Relative, Directory)
+-}
+
+shrink :: [String] -> [String]
+shrink [""] = [""]
+shrink ["", ""] = []
+shrink ("":path) = "":_shrink path
+shrink path = _shrink path
+
+_shrink :: [String] -> [String]
+_shrink [] = []
+_shrink [""] = [""]
+_shrink ("":path) = path
+_shrink (p:ps) = p:_shrink ps
+
+isRoot :: Path -> Bool
+isRoot [] = True
+isRoot _ = False
+
+isAbsolute :: Path -> Bool
+isAbsolute [] = True
+isAbsolute [""] = False
+isAbsolute ("":_) = True 
+isAbsolute _ = False
+
+isRelative :: Path -> Bool
+isRelative = not . isAbsolute
+
+toAbsolute :: Path -> Path
+toAbsolute [] = []
+toAbsolute path@("":_) = path
+toAbsolute path = "":path
+
+isDirectory :: Path -> Bool
+isDirectory [] = True
+isDirectory [""] = False
+isDirectory (last -> "") = True
+isDirectory _ = False
+
+isFile :: Path -> Bool
+isFile = not . isDirectory
+
+(</>) :: Path -> Path -> Path
+base </> path
+    | isAbsolute path = path
+    | isRoot base = toAbsolute path
+    | otherwise = trimDir base <> path
+    where trimDir path@(last -> "") = trimLast path
+          trimDir path = path

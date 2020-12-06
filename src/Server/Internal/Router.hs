@@ -12,7 +12,7 @@ module Server.Internal.Router (
 
 import Prelude hiding ( head, tail )
 
-import Data.Text ( pack, unpack, head, intercalate )
+import Data.Text ( unpack, head )
 import qualified Data.Text as Text ( length )
 import Data.Text.Encoding ( encodeUtf8 )
 import Control.Monad.Trans.Maybe
@@ -22,9 +22,8 @@ import Network.HTTP.Types.Method ( Method, methodGet, methodPost )
 import Network.HTTP.Types.URI ( Query )
 import Network.Wai ( lazyRequestBody, queryString, pathInfo, requestMethod, Request, Response )
 
-import Utils ( split )
-import Directory ( (</>) )
-import Server.Types ( Path, Body, Param, cons, encode )
+import Utils ( for )
+import Server.Types ( Path, Body, Param, buildPath, (</>), cons, encode )
 import Server.Internal.Handler ( Handler (..), Handlable (..) )
 import Server.Response ( notFound )
 
@@ -83,17 +82,6 @@ newRouter ioRts = WriterT $ do
 
 runRouter :: RawRouter -> IO [Route]
 runRouter = execWriterT
-
-buildPath :: RawPattern -> IO Path
-buildPath raw = map pack <$> (validate . filterRoot) parts
-    where parts = split '/' raw
-          filterRoot [""] = []
-          filterRoot xs = xs
-          validate [] = return []
-          validate ps@[_] = return ps
-          validate (p:ps) = case p of
-              '*':_ -> fail $ "invalid pattern: " ++ raw
-              _ -> (p:) <$> validate ps
 
 toRouterAsRoot :: RouterDSL -> RawRouter
 toRouterAsRoot dsl = root
@@ -155,18 +143,12 @@ mount base dsl = newRouterDSL $ \root -> do
         path <- buildPath base
         validate path
         routes <- runRouterDSL dsl root
-        routes' <- flip mapM routes $ runReader $ do
-            Route m p h <- ask
-            return $ do
-                p' <- consPath path p
-                return $ Route m p' h
+        let routes' = for routes $ \(Route m p h) -> Route m (path </> p) h
         return routes'
     where validate path
               | Text.length (last path) == 0 = return ()
               | head (last path) == '*' = fail $ "invalid base pattern: " ++ base
               | otherwise = return ()
-          consPath base path =
-              buildPath (unpack (intercalate "/" base) </> unpack (intercalate "/" path))
 
 buildRawRouter :: RawRouter -> Method -> Path -> Query -> Body -> Request -> IO Response
 buildRawRouter rt method path query body request = do
