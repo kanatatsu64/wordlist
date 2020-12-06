@@ -10,7 +10,7 @@
       |       +------/:id            GET: Bundleを取得
       |                              POST: Bundleに追加
       +----/card
-      |       +------/:id            GET: Cardを取得 (not yet)
+      |       +------/:id            GET: Cardを取得
       |
       +----/plugin
               +------/info
