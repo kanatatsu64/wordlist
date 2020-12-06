@@ -19,7 +19,8 @@ export const CardPage : React.FC<PropsType> = props => {
     const card = bundle?.cards[index]
 
     const menu = React.useMemo(() => (
-        <button>Start Learning</button>
+        <>
+        </>
     ), [])
 
     React.useEffect(() => {
@@ -27,7 +28,7 @@ export const CardPage : React.FC<PropsType> = props => {
             setBundle(await load(bundleId))
             setIndex(0)
         })()
-    }, [name])
+    }, [bundleId])
     React.useEffect(() => {
         props.setMenu(menu)
     }, [menu])
