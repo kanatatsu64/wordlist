@@ -56,3 +56,9 @@ export type Card = {
     note: string
     examples: Example[]
 }
+
+export type PluginInfo = {
+    pluginid: PluginID
+    name: string
+    desc: string
+}
