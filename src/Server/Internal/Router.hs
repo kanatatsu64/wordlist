@@ -54,7 +54,10 @@ cd path dsl = local go dsl
     where go (Env base router) = Env (base </> path) router
 
 fetch :: RouterDSL () -> RouterDSL Router
-fetch dsl = snd <$> listen dsl
+fetch dsl = do
+    env <- getEnv
+    router <- liftIO $ runDSL dsl env
+    return router
 
 getEnv :: RouterDSL Env
 getEnv = ask
@@ -66,7 +69,7 @@ getRoot :: RouterDSL Root
 getRoot = asks env_root
 
 runDSL :: RouterDSL () -> Env -> Root
-runDSL env = execWriterT . runReaderT env
+runDSL dsl env = execWriterT $ runReaderT dsl env
 
 buildRouter :: RouterDSL () -> Root
 buildRouter dsl = root
