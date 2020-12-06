@@ -11,11 +11,11 @@ module Utils (
     cons,
     shrink,
     same,
-    contentEqual
+    contentEqual,
+    trimLast
 ) where
 
 import System.IO
-import Control.Applicative
 import Control.Monad.Cont
 import Control.Monad.State
 import Data.Functor.Identity
@@ -79,3 +79,8 @@ same = and . shrink (==)
 
 contentEqual :: (Eq a, Ord a) => [a] -> [a] -> Bool
 contentEqual xs ys = sort xs == sort ys
+
+trimLast :: [a] -> [a]
+trimLast [] = []
+trimLast [_] = []
+trimLast (x:xs) = x:trimLast xs
