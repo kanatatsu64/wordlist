@@ -57,6 +57,7 @@ python3 test-helper.py
 ### Frontend
 
 1. `client/src/Plugins/`下にPluginを作成する。
+1. `client/src/Plugin.ts`の`pluginIds`リストにPluginIDを追加する。
 1. `client/src/Plugin.ts`の`loadModule`関数にPluginIDとPluginのimport文を追加する。
 
 ## SQLite3のインストール

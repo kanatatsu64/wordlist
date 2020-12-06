@@ -10,6 +10,10 @@ import { Loading } from 'Lib/Loading'
     }
  */
 
+export const pluginIds = [
+    'c2cc10e1-57d6-4b6f-9899-38d972112d8c'
+]
+
 const loadModule = async (pluginid: string): Promise<PluginModuleType> => {
     switch (pluginid) {
         case 'c2cc10e1-57d6-4b6f-9899-38d972112d8c': return import('Plugins/German/Plugin')
