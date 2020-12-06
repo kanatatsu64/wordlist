@@ -6,9 +6,13 @@
 +---/api
       +----/bundle                   POST: Bundleを追加
       |       +------/list
-      |       |         +----/name   GET: Bundleの名前とuuidをすべて取得
+      |       |         +----/info   GET: Bundleの情報をすべて取得
       |       +------/:id            GET: Bundleを取得
       |                              POST: Bundleに追加
       +----/card
-              +------/:id            GET: Cardを取得 (not yet)
+      |       +------/:id            GET: Cardを取得 (not yet)
+      |
+      +----/plugin
+              +------/info
+                        +----/:id    GET: Pluginの情報を取得
               
