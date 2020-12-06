@@ -22,19 +22,68 @@ import Network.HTTP.Types.Method ( Method, methodGet, methodPost )
 import Network.HTTP.Types.URI ( Query )
 import Network.Wai ( lazyRequestBody, queryString, pathInfo, requestMethod, Request, Response )
 
-import Utils ( for )
-import Server.Types ( Path, Body, Param, buildPath, (</>), cons, encode )
+import Server.Types ( Path, Body, Param, queryToParams, buildPath, (</>), cons, encode )
 import Server.Internal.Handler ( Handler (..), Handlable (..) )
 import Server.Response ( notFound )
 
-responder :: Router -> Request -> IO Response
-responder = responderRaw . toRouterAsRoot
+type RawPattern = String
+type Pattern = Path
 
-responderRaw :: RawRouter -> Request -> IO Response
-responderRaw router request = parseRequest request (buildRawRouter router)
+data Route = Route {
+    method :: Method,
+    pattern :: Pattern,
+    handler :: Handler
+}
 
-responderDSL :: RouterDSL -> RawRouter -> Request -> IO Response
-responderDSL dsl root = responderRaw $ toRouter dsl root
+type Router = [Route]
+type Root = IO [Route]
+
+data Env = Env {
+    env_base :: Path,
+    env_root :: Root
+}
+type RouterDSL a = ReaderT Env (WriterT Router IO) a
+
+add :: Route -> RouterDSL ()
+add (Route m p h) = do
+    base <- asks env_base
+    tell [Route m (base </> p) h]
+
+cd :: Path -> RouterDSL () -> RouterDSL ()
+cd path dsl = local go dsl
+    where go (Env base router) = Env (base </> path) router
+
+fetch :: RouterDSL () -> RouterDSL Router
+fetch dsl = snd <$> listen dsl
+
+getEnv :: RouterDSL Env
+getEnv = ask
+
+getBase :: RouterDSL Path
+getBase = asks env_base
+
+getRoot :: RouterDSL Root
+getRoot = asks env_root
+
+runDSL :: RouterDSL () -> Env -> Root
+runDSL env = execWriterT . runReaderT env
+
+buildRouter :: RouterDSL () -> Root
+buildRouter dsl = root
+    where root = runDSL dsl (Env [] root)
+
+responder :: RouterDSL () -> Request -> IO Response
+responder dsl request = (parseRequest request . parseRoot . buildRouter) dsl
+
+parseRoot :: Root -> Method -> Path -> Query -> Body -> Request -> IO Response
+parseRoot root method path query body request = do
+    router <- root
+    mres <- runMaybeT $ selectRoute router method path
+    case mres of
+        Just (Route _ _ (Handler h), rparams) -> (toController h) body (cons rparams qparams) request
+        Nothing -> notFound
+    where qparams :: [Param]
+          qparams = queryToParams query
 
 parseRequest :: MonadIO m =>
                 Request ->
@@ -52,126 +101,12 @@ createResponder :: Route -> [Param] -> Request -> IO Response
 createResponder (Route _ _ (Handler h)) params = flip parseRequest $
     \_ _ query body request -> (toController h) body (cons params (queryToParams query)) request
 
-type RawPattern = String
-
-queryToParams :: Query -> [Param]
-queryToParams = id
-
-type Pattern = Path
-
-data Route = Route {
-    method :: Method,
-    pattern :: Pattern,
-    handler :: Handler
-}
-
-type Router = RouterDSL
-type RawRouter = WriterT [Route] IO ()
-type RouterDSL = ReaderT RawRouter (WriterT [Route] IO) ()
-
-create :: Route -> RawRouter 
-create r = creates [r]
-
-creates :: [Route] -> RawRouter
-creates = tell
-
-newRouter :: IO [Route] -> RawRouter
-newRouter ioRts = WriterT $ do
-    rts <- ioRts
-    return ((), rts)
-
-runRouter :: RawRouter -> IO [Route]
-runRouter = execWriterT
-
-toRouterAsRoot :: RouterDSL -> RawRouter
-toRouterAsRoot dsl = root
-    where root = toRouter dsl root
-
-toRouter :: RouterDSL -> RawRouter -> RawRouter
-toRouter = runReaderT
-
-fromRouter :: RawRouter -> RouterDSL
-fromRouter rt = ReaderT $ const rt
-
-createDSL :: Route -> RouterDSL
-createDSL = fromRouter . create
-
-createsDSL :: [Route] -> RouterDSL
-createsDSL = fromRouter. creates
-
-newRouterDSL :: (RawRouter -> IO [Route]) -> RouterDSL
-newRouterDSL k = ReaderT $ \root -> newRouter (k root)
-
-runRouterDSL :: RouterDSL -> RawRouter -> IO [Route]
-runRouterDSL dsl root = execWriterT $ runReaderT dsl root
-
-get :: RawPattern -> Handler -> RouterDSL
-get raw handler = do
-    path <- liftIO $ buildPath raw
-    createDSL $ Route methodGet path handler
-
-post :: RawPattern -> Handler -> RouterDSL
-post raw handler = do
-    path <- liftIO $ buildPath raw
-    createDSL $ Route methodPost path handler
-
-type RoutePattern = Handler -> RouterDSL
-
-parsePattern :: RoutePattern -> RawRouter -> IO (Method, Path)
-parsePattern pat root = do
-    [Route method path _] <- runRouterDSL (pat undefined) root
-    return (method, path)
-
-(~>) :: RoutePattern -> RoutePattern -> RouterDSL
-src ~> dst = newRouterDSL $ \root -> do
-    (ms, ps) <- parsePattern src root
-    (md, pd) <- parsePattern dst root
-    let handler = redirect root md pd
-    return [Route ms ps handler]
-
-redirect :: RawRouter -> Method -> Path -> Handler
-redirect root method path = Handler $ \request -> do
-        mres <- runMaybeT $ selectRoute root method path
-        case mres of
-            Just (route, rparams) -> do
-                let responder = createResponder route rparams
-                responder request
-            Nothing -> notFound
-
-mount :: RawPattern -> RouterDSL -> RouterDSL
-mount base dsl = newRouterDSL $ \root -> do
-        path <- buildPath base
-        validate path
-        routes <- runRouterDSL dsl root
-        let routes' = for routes $ \(Route m p h) -> Route m (path </> p) h
-        return routes'
-    where validate path
-              | Text.length (last path) == 0 = return ()
-              | head (last path) == '*' = fail $ "invalid base pattern: " ++ base
-              | otherwise = return ()
-
-buildRawRouter :: RawRouter -> Method -> Path -> Query -> Body -> Request -> IO Response
-buildRawRouter rt method path query body request = do
-    mres <- runMaybeT $ selectRoute rt method path
-    case mres of
-        Just (Route _ _ (Handler h), rparams) -> (toController h) body (cons rparams qparams) request
-        Nothing -> notFound
-    where qparams :: [Param]
-          qparams = queryToParams query
-
-buildRouterDSL :: RouterDSL -> RawRouter -> Method -> Path -> Query -> Body -> Request -> IO Response
-buildRouterDSL dsl root = buildRawRouter $ toRouter dsl root
-
-selectRoute :: RawRouter -> Method -> Path -> MaybeT IO (Route, [Param])
-selectRoute rt method path = do
-        routes <- liftIO $ runRouter rt
-        choose routes method path
-    where choose :: [Route] -> Method -> Path -> MaybeT IO (Route, [Param])
-          choose [] _ _ = MaybeT $ return Nothing
-          choose (r:rs) method path
-              | matched = return (r, params)
-              | otherwise = choose rs method path
-              where (matched, params) = match r method path
+selectRoute :: Router -> Method -> Path -> MaybeT IO (Route, [Param])
+selectRoute [] _ _ = MaybeT $ return Nothing
+selectRoute (r:rs) method path
+    | matched = return (r, params)
+    | otherwise = selectRoute rs method path
+    where (matched, params) = match r method path
 
 match :: Route -> Method -> Path -> (Bool, [Param])
 match (Route method' pattern' _) method path
@@ -199,3 +134,45 @@ match (Route method' pattern' _) method path
           matchPath _ _ = return False
           failure :: (Bool, [Param])
           failure = (False, [])
+
+get :: RawPattern -> Handler -> RouterDSL ()
+get raw handler = do
+    path <- liftIO $ buildPath raw
+    add $ Route methodGet path handler
+
+post :: RawPattern -> Handler -> RouterDSL ()
+post raw handler = do
+    path <- liftIO $ buildPath raw
+    add $ Route methodPost path handler
+
+type RoutePattern = Handler -> RouterDSL ()
+
+(~>) :: RoutePattern -> RoutePattern -> RouterDSL ()
+src ~> dst = do
+    [Route ms ps _] <- fetch $ src undefined
+    [Route md pd _] <- fetch $ dst undefined
+    handler <- redirect md pd
+    add $ Route ms ps handler
+
+redirect :: Method -> Path -> RouterDSL Handler
+redirect method path = do
+    root <- getRoot
+    return $ Handler $ \request -> do
+        router <- root
+        mres <- runMaybeT $ selectRoute router method path
+        case mres of
+            Just (route, rparams) -> do
+                let responder = createResponder route rparams
+                responder request
+            Nothing -> notFound
+
+mount :: RawPattern -> RouterDSL () -> RouterDSL ()
+mount base dsl = do
+    path <- liftIO $ buildPath base
+    validate path
+    cd path dsl
+    where
+        validate path
+            | Text.length (last path) == 0 = return ()
+            | head (last path) == '*' = fail $ "invalid base pattern: " ++ base
+            | otherwise = return ()
