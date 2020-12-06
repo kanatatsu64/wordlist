@@ -1,3 +1,5 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Utils (
     contFile,
     cont,
@@ -12,8 +14,12 @@ module Utils (
     shrink,
     same,
     contentEqual,
-    trimLast
+    trimLast,
+    lines
 ) where
+
+import Prelude hiding ( lines )
+import qualified Prelude ( lines )
 
 import System.IO
 import Control.Monad.Cont
@@ -84,3 +90,8 @@ trimLast :: [a] -> [a]
 trimLast [] = []
 trimLast [_] = []
 trimLast (x:xs) = x:trimLast xs
+
+lines :: String -> [String]
+lines str = for (Prelude.lines str) $ \line -> trim line
+    where trim line@(last -> '\r') = trimLast line
+          trim line = line
