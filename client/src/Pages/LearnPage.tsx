@@ -5,6 +5,7 @@ import { BundleID, Bundle, Card } from 'Types'
 import { load } from 'Api/Bundle'
 import { View } from 'Card/View'
 import { Center } from 'Lib/Align'
+import { Loading } from 'Lib/Loading'
 
 type PropsType = {
     setMenu: (menu: ReactElement) => void
@@ -61,11 +62,6 @@ export const LearnPage : React.FC<PropsType> = props => {
             <View card={ card } key={ card.cardid } { ...attrs } ></View>
         </div>
     )
-    const loading = (
-        <div>
-            <span>loading ...</span>
-        </div>
-    )
 
     return (
         <>
@@ -76,7 +72,7 @@ export const LearnPage : React.FC<PropsType> = props => {
                     </Center>
                     { viewCard(card) }
                 </>
-            ): loading
+            ): <Loading></Loading>
             }
         </>
     )

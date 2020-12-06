@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react'
 import { useParams } from 'react-router-dom'
 
 import { CardID, Card } from 'Types'
+import { Loading } from 'Lib/Loading'
 import { View } from 'Card/View'
 import { load } from 'Api/Card'
 
@@ -34,15 +35,9 @@ export const CardPage: React.FC<PropsType> = props => {
         props.setMenu(menu)
     }, [menu])
 
-    const loading = (
-        <div>
-            <span>loading ...</span>
-        </div>
-    )
-
     return (
         !!card ? (
             <View card={ card }></View>
-        ) : loading
+        ) : <Loading></Loading>
     )
 }

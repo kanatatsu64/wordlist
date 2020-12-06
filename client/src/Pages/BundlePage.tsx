@@ -7,6 +7,7 @@ import { load } from 'Api/Bundle'
 import { Center } from 'Lib/Align'
 import { Sequence } from 'Lib/Sequence'
 import { Dial } from 'Lib/Dial'
+import { Loading } from 'Lib/Loading'
 import { mod } from 'Utils'
 import { UploadForm } from 'Bundle/UploadForm'
 
@@ -95,12 +96,6 @@ export const BundlePage: React.FC<PropsType> = props => {
         </Dial>
     )
 
-    const loading = (
-        <div>
-            <span>loading ...</span>
-        </div>
-    )
-
     return (
         !!bundle ? (
             <>
@@ -115,7 +110,6 @@ export const BundlePage: React.FC<PropsType> = props => {
                     <UploadForm bundleId={ bundleId } onUploaded={ onUploaded }></UploadForm>
                 </Modal>
             </>
-        ): loading
-            
+        ): <Loading></Loading>
     )
 }
