@@ -42,7 +42,7 @@ export const TopPage: React.FC<PropsType> = props => {
     }, [menu])
 
     const onSelect = (bundleInfo: BundleInfo) => {
-        history.push(`/bundle/table/${ bundleInfo.bundleid }`)
+        history.push(`/bundle/${ bundleInfo.bundleid }`)
     }
     const onDelete = (bundleInfo: BundleInfo) => {
         alert(`delete ${ bundleInfo.name }`)
