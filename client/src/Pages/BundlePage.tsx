@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import Modal from 'react-modal'
 
-import { Bundle, Card } from 'Types'
+import { BundleID, Bundle, Card } from 'Types'
 import { load } from 'Api/Bundle'
 import { Center } from 'Lib/Align'
 import { Sequence } from 'Lib/Sequence'
@@ -13,15 +13,18 @@ import { UploadForm } from 'Bundle/UploadForm'
 type PropsType = {
     setMenu: (menu: ReactElement) => void
 }
+type ParamsType = {
+    bundleId: BundleID
+}
 
-export const BundleTablePage: React.FC<PropsType> = props => {
-    const { bundleId } = useParams()
+export const BundlePage: React.FC<PropsType> = props => {
+    const { bundleId } = useParams<ParamsType>()
 
     const history = useHistory()
     const [bundle, setBundle] = React.useState<Bundle>(undefined)
     const [from, setFrom] = React.useState(0)
     const [isOpen, setIsOpen] = React.useState(false)
-    const cards = bundle?.cards
+    const cards = React.useMemo(() => bundle?.cards, [bundle])
 
     const onStartLearning = () => {
         history.push(`/bundle/learn/${ bundleId }`)
@@ -57,6 +60,10 @@ export const BundleTablePage: React.FC<PropsType> = props => {
         updateBundle()
     }
 
+    const onSelect = (card: Card) => {
+        history.push(`/card/${card.cardid}`)
+    }
+
     const onNext = () => {
         setFrom(mod(from + 1, cards.length))
     }
@@ -73,8 +80,9 @@ export const BundleTablePage: React.FC<PropsType> = props => {
                     <Sequence from={ from } count={ 3 }>
                         {cards.map(card => {
                             const { word, meaning, cardid } = card
+                            const onClick = () => onSelect(card)
                             return (
-                                <tr key={ cardid }>
+                                <tr key={ cardid } onClick={ onClick }>
                                     <td><Center>{ word }</Center></td>
                                     <td><Center>{ meaning }</Center></td>
                                 </tr>

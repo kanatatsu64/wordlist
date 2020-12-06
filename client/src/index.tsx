@@ -6,7 +6,7 @@ import Modal from 'react-modal'
 import { Center } from 'Lib/Align'
 import { Header } from 'Parts/Header'
 import { TopPage } from 'Pages/TopPage'
-import { BundleTablePageAsync, CardPageAsync } from 'Pages/Async'
+import { BundlePageAsync, CardPageAsync, LearnPageAsync } from 'Pages/Async'
 import style from './index.scss'
 import './index.scss'
 
@@ -23,11 +23,14 @@ const App: React.FC<{}> = props => {
                     <Route exact path="/">
                         <TopPage setMenu={ setMenu }></TopPage>
                     </Route>
-                    <Route exact path="/bundle/table/:bundleId">
-                        <BundleTablePageAsync setMenu={ setMenu }></BundleTablePageAsync>
+                    <Route exact path="/card/:cardId">
+                        <CardPageAsync setMenu={ setMenu }></CardPageAsync>
+                    </Route>
+                    <Route exact path="/bundle/:bundleId">
+                        <BundlePageAsync setMenu={ setMenu }></BundlePageAsync>
                     </Route>
                     <Route exact path="/bundle/learn/:bundleId">
-                        <CardPageAsync setMenu={ setMenu }></CardPageAsync>
+                        <LearnPageAsync setMenu={ setMenu }></LearnPageAsync>
                     </Route>
                 </Switch>
             </Center>
