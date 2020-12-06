@@ -19,10 +19,17 @@ import qualified Plugins.German.Conjunction as Conjunction ( parse )
 uuid :: MonadFail m => m UUID
 uuid = fromString "c2cc10e1-57d6-4b6f-9899-38d972112d8c"
 
+_name :: String
+_name = "German"
+
+_desc :: String
+_desc = "basic german plugin"
+
+
 getPlugin :: MonadFail m => m Plugin
 getPlugin = do
     _uuid <- uuid
-    return $ Plugin _uuid _toCard _fromCard
+    return $ Plugin _uuid _name _desc _toCard _fromCard
 
 _toCard :: CardID -> [String] -> Maybe Card.Card
 _toCard _cardid vals = do
