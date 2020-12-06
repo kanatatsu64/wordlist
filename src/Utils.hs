@@ -10,7 +10,8 @@ module Utils (
     withIndex,
     cons,
     shrink,
-    same
+    same,
+    contentEqual
 ) where
 
 import System.IO
@@ -18,6 +19,7 @@ import Control.Applicative
 import Control.Monad.Cont
 import Control.Monad.State
 import Data.Functor.Identity
+import Data.Sort
 
 contFile path mode = cont $ withFile path mode
 
@@ -74,3 +76,6 @@ shrink f (x:y:rs) = f x y:shrink f (y:rs)
 
 same :: Eq a => [a] -> Bool
 same = and . shrink (==)
+
+contentEqual :: (Eq a, Ord a) => [a] -> [a] -> Bool
+contentEqual xs ys = sort xs == sort ys
