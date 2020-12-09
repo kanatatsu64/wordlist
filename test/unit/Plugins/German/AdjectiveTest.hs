@@ -11,7 +11,7 @@ module Plugins.German.AdjectiveTest (
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Serializable ( Serializable (..), Serial (..) )
+import Serial ( Serial (..), serialize )
 import Plugins.German.Card ( GermanCard (..), Part (..), Example (..) )
 import Plugins.German.Adjective (
         parse,
@@ -65,7 +65,7 @@ test_parseAttrs = testCase "parseAttrs" do
         sup = "-est"
         attr = [comp, sup, "dummy"]
         cons = id
-        next = \vals [Serial comp', Serial sup'] -> do
+        next = \vals [comp', sup'] -> do
             let actual = vals
                 expected = ["dummy"]
             assertEqual "values are consumed" expected actual

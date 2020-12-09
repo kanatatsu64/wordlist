@@ -1,4 +1,4 @@
-module Integration.TestInit (
+module TestInit (
     initTest
 ) where
 
@@ -7,7 +7,7 @@ import Control.Monad
 import Server.SQL ( runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
 import Server.Bundle ( BundleSchema, BundleToCardSchema )
 import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
-import Integration.TestUtils ( execRuntime )
+import TestUtils ( execRuntime )
 
 initTest :: IO ()
 initTest = initDB

@@ -1,4 +1,4 @@
-module Integration.CardTest (
+module CardTest (
     test_all,
 
     test_saveAndLoad
@@ -6,12 +6,11 @@ module Integration.CardTest (
 
 import Test.Tasty
 import Test.Tasty.HUnit
-import Prelude hiding ( log )
 
 import Serial
 import UUID
 import Server.Card
-import Integration.TestUtils ( log, execRuntime )
+import TestUtils ( execRuntime )
 
 test_all = testGroup "Card" [
         test_saveAndLoad
@@ -33,9 +32,7 @@ test_saveAndLoad = testCase "save and load" do
             ]
         card = Card _cardid _pluginid _language _word _meaning _attrs _note _examples
     execRuntime $ runSave card
-    log "card is saved"
     card' <- execRuntime $ runLoad (cardid card)
-    log "card id loaded"
 
     assertEqual "cardid" (cardid card) (cardid card')
     assertEqual "pluginid" (pluginid card) (pluginid card')

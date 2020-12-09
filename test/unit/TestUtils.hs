@@ -3,7 +3,7 @@ module TestUtils (
     getTestUUID
 ) where
 
-import Serializable ( Serial (..) )
+import Serial ( Serial (..) )
 import Card ( Card (..), Language (..), Example (..) )
 import UUID ( UUID, fromString )
 

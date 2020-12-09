@@ -1,17 +1,15 @@
-module Integration.Spec (
-    test_all,
-    initTest,
-
-    test_card
-) where
-
 import Test.Tasty
 
-import Integration.TestInit ( initTest )
-import qualified Integration.CardTest as CardTest
+import TestInit ( initTest )
+import qualified CardTest as CardTest
 
-test_all = testGroup "Integration" [
+test_all = testGroup "Integration Tests" [
         test_card
     ]
 
 test_card = CardTest.test_all
+
+main :: IO ()
+main = do
+    initTest
+    defaultMain test_all

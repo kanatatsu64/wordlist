@@ -1,4 +1,4 @@
-module SQLTest (
+module Server.Internal.SQLTest (
     test_all,
 
     test_buildSQL,
@@ -18,7 +18,7 @@ module SQLTest (
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import SQL (
+import Server.Internal.SQL (
         toSql,
         buildSQL,
         nop,

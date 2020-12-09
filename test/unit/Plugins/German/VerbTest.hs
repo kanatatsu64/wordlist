@@ -13,7 +13,7 @@ module Plugins.German.VerbTest (
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Serializable ( Serializable (..), Serial (..) )
+import Serial ( Serial (..), serialize )
 import Plugins.German.Card ( GermanCard (..), Part (..), Example (..) )
 import Plugins.German.Verb (
         parse,
@@ -41,7 +41,7 @@ test_parse = testGroup "parse" [
     where
         test_parse1 = testCase "parse 1" do
             let _word = "sein"
-                _kind = serialize Intransitive
+                _kind = serialize $ Serial Intransitive
                 _meaning = "is"
                 _note = "illegal"
                 _original = "Ich bin einen Mann."
@@ -60,7 +60,7 @@ test_parse = testGroup "parse" [
             assertEqual "word" _word (word card)
 
             let [kind'] = map serialize (attrs card)
-            assertEqual "kind" (serialize Intransitive) kind'
+            assertEqual "kind" (serialize $ Serial Intransitive) kind'
 
             assertEqual "meaning" _meaning (meaning card)
             assertEqual "note" _note (note card)
@@ -72,7 +72,7 @@ test_parse = testGroup "parse" [
             assertEqual "translation" _translation translation'
         test_parse2 = testCase "parse 2" do
             let _word = "haben"
-                _kind = serialize Transitive
+                _kind = serialize $ Serial Transitive
                 _form = "- (4)"
                 _meaning = "have"
                 _note = "illegal"
@@ -92,7 +92,7 @@ test_parse = testGroup "parse" [
             assertEqual "word" _word (word card)
 
             let [kind', form'] = map serialize (attrs card)
-            assertEqual "kind" (serialize Transitive) kind'
+            assertEqual "kind" (serialize $ Serial Transitive) kind'
             assertEqual "form" _form form'
 
             assertEqual "meaning" _meaning (meaning card)
@@ -110,12 +110,12 @@ test_isIntransitive = testGroup "isIntransitive" [
     ]
     where
         test_isIntransitive1 = testCase "isIntransitive 1" do
-            let str = serialize Intransitive
+            let str = serialize $ Serial Intransitive
                 actual = isIntransitive str
                 expected = True
             assertEqual "isIntransitive Intransitive" expected actual
         test_isIntransitive2 = testCase "isIntransitive 2" do
-            let str = serialize Transitive
+            let str = serialize $ Serial Transitive
                 actual = isIntransitive str
                 expected = False
             assertEqual "isIntransitive Transitive" expected actual
@@ -126,12 +126,12 @@ test_isTransitive = testGroup "isTransitive" [
     ]
     where
         test_isTransitive1 = testCase "isTransitive 1" do
-            let str = serialize Intransitive
+            let str = serialize $ Serial Intransitive
                 actual = isTransitive str
                 expected = False
             assertEqual "isTransitive Intransitive" expected actual
         test_isTransitive2 = testCase "isTransitive 2" do
-            let str = serialize Transitive
+            let str = serialize $ Serial Transitive
                 actual = isTransitive str
                 expected = True
             assertEqual "isTransitive Transitive" expected actual
@@ -142,28 +142,28 @@ test_parseAttrs = testGroup "parseAttrs" [
     ]
     where
         test_parseAttrs1 = testCase "parseAttrs 1" do
-            let kind = serialize Intransitive
+            let kind = serialize $ Serial Intransitive
                 vals = [kind, "dummy1", "dummy2"]
                 cons = id
-                next = \vals' [Serial kind'] -> do
+                next = \vals' [kind'] -> do
                     let expected = ["dummy2"]
                         actual = vals'
                     assertEqual "values are consumed" expected actual
-                    let expected = serialize Intransitive
+                    let expected = serialize $ Serial Intransitive
                         actual = serialize kind'
                     assertEqual "arg to cons is correct" expected actual
             f <- maybeToFail "failed to parseAttrs" $ parseAttrs vals cons
             f next
         test_parseAttrs2 = testCase "parseAttrs 2" do
-            let kind = serialize Transitive
+            let kind = serialize $ Serial Transitive
                 form = "- (4)"
                 vals = [kind, form, "dummy"]
                 cons = id
-                next = \vals' [Serial kind', Serial form'] -> do
+                next = \vals' [kind', form'] -> do
                     let expected = ["dummy"]
                         actual = vals'
                     assertEqual "values are consumed" expected actual
-                    let expected = serialize Transitive
+                    let expected = serialize $ Serial Transitive
                         actual = serialize kind'
                     assertEqual "kind" expected actual
                     let expected = "- (4)"

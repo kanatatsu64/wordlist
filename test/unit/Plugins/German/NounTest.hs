@@ -14,7 +14,7 @@ module Plugins.German.NounTest (
 import Test.Tasty
 import Test.Tasty.HUnit
 
-import Serializable ( Serializable (..) )
+import Serial ( Serial (..), serialize )
 import Plugins.German.Card ( GermanCard (..), Part (..), Example (..) )
 import Plugins.German.Noun (
         parse,
@@ -40,7 +40,7 @@ test_all = testGroup "Noun" [
 test_parse = testCase "parse" do
     let _word = "Name"
         _pl = "-n"
-        _gen = serialize Male
+        _gen = serialize $ Serial Male
         _meaning = "name"
         _note = "illegal"
         _original = "mein Name"
@@ -59,7 +59,7 @@ test_parse = testCase "parse" do
     assertEqual "word" _word (word card)
 
     let [pl', gen'] = map serialize (attrs card)
-    assertEqual "pl" (serialize _pl) pl'
+    assertEqual "pl" _pl pl'
     assertEqual "gen" _gen gen'
 
     assertEqual "meaning" _meaning (meaning card)
@@ -78,17 +78,17 @@ test_isMale = testGroup "isMale" [
     ]
     where
         test_isMale1 = testCase "isMale 1" do
-            let str = serialize Male
+            let str = serialize $ Serial Male
                 actual = isMale str
                 expected = True
             assertEqual "isMale Male" expected actual
         test_isMale2 = testCase "isMale 2" do
-            let str = serialize Female
+            let str = serialize $ Serial Female
                 actual = isMale str
                 expected = False
             assertEqual "isMale Female" expected actual
         test_isMale3 = testCase "isMale 3" do
-            let str = serialize Neuter
+            let str = serialize $ Serial Neuter
                 actual = isMale str
                 expected = False
             assertEqual "isMale Neuter" expected actual
@@ -100,17 +100,17 @@ test_isFemale = testGroup "isFemale" [
     ]
     where
         test_isFemale1 = testCase "isFemale 1" do
-            let str = serialize Male
+            let str = serialize $ Serial Male
                 actual = isFemale str
                 expected = False
             assertEqual "isFemale Male" expected actual
         test_isFemale2 = testCase "isFemale 2" do
-            let str = serialize Female
+            let str = serialize $ Serial Female
                 actual = isFemale str
                 expected = True
             assertEqual "isFemale Female" expected actual
         test_isFemale3 = testCase "isFemale 3" do
-            let str = serialize Neuter
+            let str = serialize $ Serial Neuter
                 actual = isFemale str
                 expected = False
             assertEqual "isFemale Neuter" expected actual
@@ -122,25 +122,25 @@ test_isNeuter = testGroup "isNeuter" [
     ]
     where
         test_isNeuter1 = testCase "isNeuter 1" do
-            let str = serialize Male
+            let str = serialize $ Serial Male
                 actual = isNeuter str
                 expected = False
             assertEqual "isNeuter Male" expected actual
         test_isNeuter2 = testCase "isNeuter 2" do
-            let str = serialize Female
+            let str = serialize $ Serial Female
                 actual = isNeuter str
                 expected = False
             assertEqual "isNeuter Female" expected actual
         test_isNeuter3 = testCase "isNeuter 3" do
-            let str = serialize Neuter
+            let str = serialize $ Serial Neuter
                 actual = isNeuter str
                 expected = True
             assertEqual "isNeuter Neuter" expected actual
 
 test_parseAttrs = testCase "parseAttrs" do
-    let pl = "plural"
-        gen = Male
-        attr = [pl, serialize gen, "dummy"]
+    let pl = Serial "plural"
+        gen = Serial Male
+        attr = [serialize pl, serialize gen, "dummy"]
         cons = id
         next = \vals [pl', gen'] -> do
             let actual = vals

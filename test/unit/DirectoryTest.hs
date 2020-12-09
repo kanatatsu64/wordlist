@@ -109,7 +109,12 @@ test_withExt = testGroup "withExt" [
             assertEqual "full path" expected actual
 
 test_delExt = testGroup "delExt" [
-        test_delExt1
+        test_delExt1,
+        test_delExt2,
+        test_delExt3,
+        test_delExt4,
+        test_delExt5,
+        test_delExt6
     ]
     where
         test_delExt1 = testCase "delExt 1" do

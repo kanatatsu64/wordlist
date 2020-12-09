@@ -4,5 +4,7 @@ cradle:
       component: wordlist:exe:wordlist-exe
     - path: "./src"
       component: wordlist:lib
-    - path: "./test"
-      component: wordlist:test:wordlist-test
+    - path: "./test/unit"
+      component: wordlist:test:wordlist-unit-test
+    - path: "./test/integration"
+      component: wordlist:test:wordlist-integration-test

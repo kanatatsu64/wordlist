@@ -1,4 +1,4 @@
-module Integration.TestConfig (
+module TestConfig (
     database
 ) where
 
