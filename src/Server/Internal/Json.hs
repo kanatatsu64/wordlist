@@ -31,6 +31,7 @@ import qualified Text.Parsec ( parse )
 import Text.ParserCombinators.Parsec ( CharParser )
 
 import Convertible ( Convertible (..), ConvertError (..), ConvertResult (..), convert )
+import Utils ( (<||>) )
 
 type JKey = String
 data JRec = JRec JKey JObj
@@ -134,10 +135,6 @@ _parse name input = case Text.Parsec.parse _parseJObj name input of
             spaces
             eof
             return jobj
-
-(<||>) :: [a] -> [a] -> [a]
-[] <||> bs = bs
-as <||> _ = as
 
 tryMaybe :: CharParser st a -> CharParser st (Maybe a)
 tryMaybe = optionMaybe . try
