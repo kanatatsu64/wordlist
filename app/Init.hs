@@ -4,9 +4,9 @@ module Init (
 
 import Control.Monad
 
-import SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
-import Bundle ( BundleSchema, BundleToCardSchema )
-import Card ( CardSchema, AttrSchema, ExampleSchema )
+import Server.SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
+import Server.Bundle ( BundleSchema, BundleToCardSchema )
+import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
 
 initApp :: IO ()
 initApp = initDB
