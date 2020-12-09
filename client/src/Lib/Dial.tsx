@@ -7,7 +7,7 @@ type PropsType = {
 }
 
 export const Dial: React.FC<PropsType> = props => {
-    const interval = props.interval || 100
+    const interval = props.interval || 200
 
     const [lock, setLock] = React.useState(false)
 
