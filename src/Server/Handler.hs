@@ -29,6 +29,7 @@ import Network.Wai.Parse ( FileInfo )
 
 import Directory ( (</>), getExt )
 
+import Server.Json ( Json )
 import Server.Types ( LazyByteString, ByteString, decode )
 import Server.Internal.Handler (
         Handler (..),
@@ -78,8 +79,8 @@ static base = handler $ do
 file :: FilePath -> Maybe Response.ContentType -> Handler
 file path ctype = handler $ Response.file path ctype
 
-json :: String -> Handler
-json str = handler $ Response.json str
+json :: Json -> Handler
+json js = handler $ Response.json js
 
 html :: String -> Handler
 html str =  handler $ Response.html str
