@@ -18,9 +18,11 @@ import Prelude hiding ( error )
 import Network.HTTP.Types.Status ( status200, status404, status500 )
 import Network.Wai ( responseFile, responseLBS, Request, Response )
 import Network.HTTP.Types.Header ( hContentType )
-import Network.Wai.Parse ( parseRequestBody, lbsBackEnd, FileInfo )
+import Network.Wai.Parse ( FileInfo )
 
+import Server.Json ( Json (..) )
 import Server.Types ( lazyEncode, LazyByteString, ByteString )
+import Server.Utils ( upload )
 
 type ContentType = ByteString
 
@@ -37,13 +39,12 @@ html str = return $ responseLBS status200 [(hContentType, "text/html")] $ lazyEn
 htmlFile :: FilePath -> IO Response
 htmlFile path = return $ responseFile status200 [(hContentType, "text/html")] path Nothing
 
-json :: String -> IO Response
-json str = return $ responseLBS status200 [(hContentType, "application/json")] $ lazyEncode str
+json :: Json -> IO Response
+json (Json str) = return $ responseLBS status200 [(hContentType, "application/json")] $ lazyEncode str
 
 uploader :: ((ByteString, FileInfo LazyByteString) -> IO ()) -> Request -> IO Response
 uploader callback request = do
-    (_, files) <- parseRequestBody lbsBackEnd request
-    mapM_ callback files
+    upload callback request
     ok
 
 ok :: IO Response
