@@ -23,7 +23,7 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Prelude hiding ( lookup )
 import qualified Text.Parsec as Parsec
-import Text.Parsec ( space, noneOf, anyToken, many )
+import Text.Parsec ( noneOf, anyToken, many )
 import Data.Sort ( sortOn )
 
 import Convertible ( Convertible (..), ConvertError (..) )
