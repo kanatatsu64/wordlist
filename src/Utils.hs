@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ViewPatterns #-}
 
 module Utils (
@@ -8,7 +9,9 @@ module Utils (
     split,
     maybeToFail,
     for,
+    push,
     (<@>),
+    (<||>),
     withIndex,
     cons,
     shrink,
@@ -26,6 +29,9 @@ import Control.Monad.Cont
 import Control.Monad.State
 import Data.Functor.Identity
 import Data.Sort
+
+instance MonadFail (Either String) where
+    fail = Left
 
 contFile path mode = cont $ withFile path mode
 
@@ -62,10 +68,19 @@ maybeToFail msg Nothing = fail msg
 for :: [a] -> (a -> b) -> [b]
 for = flip map
 
+push :: a -> [a] -> [a]
+push x xs = xs ++ [x]
+
 infixl 4 <@>
 
 (<@>) :: Applicative f => f (a -> b) -> a -> f b
 (<@>) h x = ($ x) <$> h
+
+infixl 3 <||>
+
+(<||>) :: [a] -> [a] -> [a]
+[] <||> bs = bs
+as <||> _ = as
 
 withIndex :: [a] -> [(Integer, a)]
 withIndex = zip [0..]
