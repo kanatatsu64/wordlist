@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 module Server.Types (
     ByteString,
@@ -38,6 +40,8 @@ import qualified Data.Text.Lazy.Encoding ( encodeUtf8, decodeUtf8 )
 import Data.ByteString ( ByteString )
 import qualified Data.ByteString.Lazy ( ByteString )
 
+import UUID ( UUID )
+import Convertible ( Convertible (..) )
 import Utils ( maybeToFail, split, trimLast )
 
 type LazyByteString = Data.ByteString.Lazy.ByteString
@@ -53,6 +57,30 @@ lazyDecode = Data.Text.Lazy.unpack . Data.Text.Lazy.Encoding.decodeUtf8
 
 decode :: ByteString -> String
 decode = Data.Text.unpack . Data.Text.Encoding.decodeUtf8
+
+instance Convertible String LazyByteString where
+    safeConvert = Right . lazyEncode
+
+instance Convertible LazyByteString String where
+    safeConvert = Right . lazyDecode
+
+instance Convertible String ByteString where
+    safeConvert = Right . encode
+
+instance Convertible ByteString String where
+    safeConvert = Right . decode
+
+instance Convertible UUID LazyByteString where
+    safeConvert uuid = safeConvert uuid >>= safeConvert @String
+
+instance Convertible LazyByteString UUID where
+    safeConvert lbstr = safeConvert lbstr >>= safeConvert @String
+
+instance Convertible UUID ByteString where
+    safeConvert uuid = safeConvert uuid >>= safeConvert @String
+
+instance Convertible ByteString UUID where
+    safeConvert bstr = safeConvert bstr >>= safeConvert @String
 
 type Path = [Text]
 type Body = LazyByteString
