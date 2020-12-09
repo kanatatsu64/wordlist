@@ -4,7 +4,7 @@ module Plugins.German.Plugin (
 ) where
 
 import UUID ( UUID, fromString )
-import Serializable ( Serial (..) )
+import Serial ( Serial (..) )
 import qualified Card ( Card (..) )
 import Types ( CardID, Language ( German ) )
 import Plugin ( Plugin (..) )

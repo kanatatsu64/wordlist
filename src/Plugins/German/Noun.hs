@@ -1,3 +1,5 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE RankNTypes #-}
 
 module Plugins.German.Noun (
@@ -12,15 +14,19 @@ module Plugins.German.Noun (
 
 import Prelude hiding ( word )
 
-import Serializable ( Serializable (..), Serial (..) )
+import Serial ( Serial (..) )
+import Convertible ( Convertible (..) )
 import Plugins.German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
 
 data Genre = Male | Female | Neuter
 
-instance Serializable Genre where
-    serialize Male = "M."
-    serialize Female = "F."
-    serialize Neuter = "N."
+instance Convertible Genre String where
+    safeConvert Male = Right "M."
+    safeConvert Female = Right "F."
+    safeConvert Neuter = Right "N."
+
+instance Convertible Genre Serial where
+    safeConvert genre = safeConvert genre >>= safeConvert @String
 
 parse = parseWord >:>
         parseAttrs >:>

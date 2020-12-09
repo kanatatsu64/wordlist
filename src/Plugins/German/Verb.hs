@@ -1,3 +1,6 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Plugins.German.Verb (
     parse,
     
@@ -7,14 +10,18 @@ module Plugins.German.Verb (
     parseAttrs
 ) where
 
-import Serializable ( Serializable (..), Serial (..) )
+import Serial ( Serial (..) )
+import Convertible ( Convertible (..) )
 import Plugins.German.Utils ( parseWord, parseMeaning, parseNote, parseExamples, (>:>) )
 
 data Kind = Intransitive | Transitive
 
-instance Serializable Kind where
-    serialize Intransitive = "I."
-    serialize Transitive = "T."
+instance Convertible Kind String where
+    safeConvert Intransitive = Right "I."
+    safeConvert Transitive = Right "T."
+
+instance Convertible Kind Serial where
+    safeConvert kind = safeConvert kind >>= safeConvert @String
 
 parse = parseWord >:>
         parseAttrs >:>
@@ -52,12 +59,14 @@ parseAttrs vals@(kind:_)
     | isIntransitive kind = parseKindI vals
     | isTransitive kind = (parseKindT >:> parseForm) vals
 
-parseKindT (_:rests) cons = Just $ \next -> next rests (_cons Transitive)
-    where _cons kind form = cons [Serial kind, Serial form]
+parseKindT (_:rests) cons = Just $ \next -> next rests (combine cons Transitive)
+    where combine :: ([Serial] -> a) -> Kind -> String -> a
+          combine cons kind form = cons [Serial kind, Serial form]
 parseKindT _ _ = Nothing
 
-parseKindI (_:_:rests) cons = Just $ \next -> next rests (_cons Intransitive)
-    where _cons kind = cons [Serial kind]
+parseKindI (_:_:rests) cons = Just $ \next -> next rests (combine cons Intransitive)
+    where combine :: ([Serial] -> a) -> Kind -> a
+          combine cons kind = cons [Serial kind]
 parseKindI _ _ = Nothing
 
 parseForm (form:rests) cons = Just $ \next -> next rests (cons form)
