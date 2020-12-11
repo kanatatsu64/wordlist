@@ -42,7 +42,7 @@ import qualified Data.ByteString.Lazy ( ByteString )
 
 import UUID ( UUID )
 import Convertible ( Convertible (..) )
-import Utils ( maybeToFail, split, trimLast )
+import Utils ( maybeToFail, split )
 
 type LazyByteString = Data.ByteString.Lazy.ByteString
 
@@ -179,5 +179,5 @@ base </> path
     | isAbsolute path = path
     | isRoot base = toAbsolute path
     | otherwise = trimDir base <> path
-    where trimDir path@(last -> "") = trimLast path
+    where trimDir path@(last -> "") = init path
           trimDir path = path

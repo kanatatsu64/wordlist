@@ -17,7 +17,6 @@ module Utils (
     shrink,
     same,
     contentEqual,
-    trimLast,
     lines
 ) where
 
@@ -101,12 +100,7 @@ same = and . shrink (==)
 contentEqual :: (Eq a, Ord a) => [a] -> [a] -> Bool
 contentEqual xs ys = sort xs == sort ys
 
-trimLast :: [a] -> [a]
-trimLast [] = []
-trimLast [_] = []
-trimLast (x:xs) = x:trimLast xs
-
 lines :: String -> [String]
 lines str = for (Prelude.lines str) $ \line -> trim line
-    where trim line@(last -> '\r') = trimLast line
+    where trim line@(last -> '\r') = init line
           trim line = line
