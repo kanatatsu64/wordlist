@@ -24,9 +24,15 @@ export type ViewPropsType = {
     card: Card
 }
 
+export type EditPropsType = {
+    card: Card
+    update: (card: Card) => void
+}
+
 export type PluginType = {
-    ViewUpside: ReactTag<ViewPropsType>,
+    ViewUpside: ReactTag<ViewPropsType>
     ViewDownside: ReactTag<ViewPropsType>
+    Edit: ReactTag<EditPropsType>
 }
 
 export type PluginModuleType = {
@@ -42,6 +48,7 @@ const loadModuleWithCache = async (pluginid: string): Promise<PluginModuleType> 
 export type PluginTypeAsync = {
     ViewUpside: ReactTag<ViewPropsType> & Loadable.LoadableComponent
     ViewDownside: ReactTag<ViewPropsType> & Loadable.LoadableComponent
+    Edit: ReactTag<EditPropsType> & Loadable.LoadableComponent
 }
 
 const wrap = (promise: Promise<PluginModuleType>): PluginTypeAsync => (
@@ -57,6 +64,13 @@ const wrap = (promise: Promise<PluginModuleType>): PluginTypeAsync => (
             loader: async () => {
                 const module = await promise
                 return module.Plugin.ViewDownside
+            },
+            loading: Loading
+        }),
+        Edit: Loadable({
+            loader: async () => {
+                const module = await promise
+                return module.Plugin.Edit
             },
             loading: Loading
         })

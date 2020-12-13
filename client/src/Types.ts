@@ -10,6 +10,8 @@ export type BundleID = UUID
 
 export type CardID = UUID
 
+export const PseudoID: PluginID & BundleID & CardID = '00000000-0000-0000-0000-000000000000'
+
 export type Language =
     'Japanese' |
     'English' |

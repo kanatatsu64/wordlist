@@ -1,5 +1,7 @@
 import { Card, CardID } from 'Types'
 
+export const uuid = 'c2cc10e1-57d6-4b6f-9899-38d972112d8c'
+
 export type Part =
     'Noun' |
     'Verb' |
@@ -14,6 +16,16 @@ export const convertPart = (part: string): Part => {
         case 'Adj.': return 'Adjective'
         case 'Adv.': return 'Adverb'
         case 'Kon.': return 'Conjunction'
+    }
+}
+
+export const revertPart = (part: Part): string => {
+    switch (part) {
+        case 'Noun': return 'N.'
+        case 'Verb': return 'V.'
+        case 'Adjective': return 'Adj.'
+        case 'Adverb': return 'Adv.'
+        case 'Conjunction': return 'Kon.'
     }
 }
 
@@ -39,6 +51,14 @@ export const convertGenre = (genre: string): Genre => {
     }
 }
 
+export const revertGenre = (genre: Genre): string => {
+    switch (genre) {
+        case 'Male': return 'M.'
+        case 'Female': return 'F.'
+        case 'Neuter': return 'N.'
+    }
+}
+
 export const shortenGenre = (genre: Genre): string => {
     switch (genre) {
         case 'Male': return 'M.'
@@ -56,10 +76,12 @@ export const convertKind = (kind: string): Kind => {
     }
 }
 
-export type Form = string
-
-export type Comparative = string
-export type Superlative = string
+export const revertKind = (kind: Kind): string => {
+    switch (kind) {
+        case 'Intransitive': return 'I.'
+        case 'Transitive': return 'T.'
+    }
+}
 
 export const shortenKind = (kind: Kind): string => {
     switch (kind) {
@@ -68,23 +90,14 @@ export const shortenKind = (kind: Kind): string => {
     }
 }
 
+export type Form = string
+
+export type Comparative = string
+export type Superlative = string
+
 export type Example = {
     original: string
     translation: string
-}
-
-const buildExamples = (attributes: string[]): Example[] => {
-    let index = 0
-    const len = attributes.length
-    const examples: Example[] = []
-    while (index < len) {
-        const original = attributes[index]
-        index = index + 1
-        const translation = attributes[index]
-        index = index + 1
-        examples.push({ original, translation })
-    }
-    return examples
 }
 
 export type Attrs = [string, string]
@@ -116,6 +129,32 @@ export const convert = (card: Card): GermanCard => {
     return {
         cardid,
         part,
+        word,
+        attrs: _attrs,
+        meaning,
+        note,
+        examples
+    }
+}
+
+export const revert = (card: GermanCard): Card => {
+    const {
+        cardid,
+        part,
+        word,
+        attrs,
+        meaning,
+        note,
+        examples
+    } = card
+
+    const _part = revertPart(part)
+    const _attrs = [_part, ...attrs]
+
+    return {
+        cardid,
+        pluginid: uuid,
+        language: 'German',
         word,
         attrs: _attrs,
         meaning,
