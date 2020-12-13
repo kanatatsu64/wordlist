@@ -4,12 +4,13 @@ module Server.Api.Card.List (
     uploadHandler
 ) where
 
-import Prelude hiding ( lookup )
+import Prelude hiding ( lookup, lines )
 import Control.Monad
 import Network.Wai.Parse ( FileInfo (..) )
 
 import Csv ( parseCsv )
 import Convertible ( failConvert )
+import Utils ( lines )
 import Plugins.Base ( getPluginById )
 import Server.Card ( Card (..), runSave )
 import Server.SQL ( execRuntime )

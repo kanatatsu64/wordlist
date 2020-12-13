@@ -7,7 +7,7 @@ module Server.Api.Bundle.Bundle (
     deleteHandler
 ) where
 
-import Prelude hiding ( lookup, lines )
+import Prelude hiding ( lookup )
 
 import UUID ( getRandom )
 import Convertible ( convert, failConvert, ConvertError (..) )
