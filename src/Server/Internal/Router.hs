@@ -7,7 +7,11 @@ module Server.Internal.Router (
     mount,
     get,
     post,
-    Router (..)
+    put,
+    delete,
+    Router (..),
+
+    parseRequest
 ) where
 
 import Prelude hiding ( head, tail )
@@ -18,7 +22,7 @@ import Data.Text.Encoding ( encodeUtf8 )
 import Control.Monad.Trans.Maybe
 import Control.Monad.Writer
 import Control.Monad.Reader
-import Network.HTTP.Types.Method ( Method, methodGet, methodPost )
+import Network.HTTP.Types.Method ( Method, methodGet, methodPost, methodPut, methodDelete )
 import Network.HTTP.Types.URI ( Query )
 import Network.Wai ( lazyRequestBody, queryString, pathInfo, requestMethod, Request, Response )
 
@@ -147,6 +151,16 @@ post :: RawPattern -> Handler -> RouterDSL ()
 post raw handler = do
     path <- liftIO $ buildPath raw
     add $ Route methodPost path handler
+
+put :: RawPattern -> Handler -> RouterDSL ()
+put raw handler = do
+    path <- liftIO $ buildPath raw
+    add $ Route methodPut path handler
+
+delete :: RawPattern -> Handler -> RouterDSL ()
+delete raw handler = do
+    path <- liftIO $ buildPath raw
+    add $ Route methodDelete path handler
 
 type RoutePattern = Handler -> RouterDSL ()
 
