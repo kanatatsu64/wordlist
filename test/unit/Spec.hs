@@ -8,10 +8,6 @@ import qualified UtilsTest
 import qualified Plugins.Spec as PluginsTest
 import qualified Server.Spec as ServerTest
 
-import qualified Server.Internal.Spec as InternalTest
-
-data TestType = Unit | Integration deriving Eq
-
 test_all = testGroup "Unit Tests" [
         test_csv,
         test_html,
