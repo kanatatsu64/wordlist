@@ -1,10 +1,19 @@
 .delete {
     border: none;
     display: inline-block;
-    .i {
+    i {
         cursor: pointer;
         background-color: red;
         color: white;
+        font-size: inherit;
+    }
+}
+
+.add {
+    border: none;
+    display: inline-block;
+    i {
+        cursor: pointer;
         font-size: inherit;
     }
 }

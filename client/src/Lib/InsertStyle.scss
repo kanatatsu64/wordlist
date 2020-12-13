@@ -1,0 +1,22 @@
+.container {
+    opacity: 0;
+    position: relative;
+    &:hover {
+        opacity: 1;
+    }
+    .line {
+        position: absolute;
+        top: -0.5em;
+        display: inline-block;
+        width: 100%;
+        white-space: nowrap;
+        hr {
+            display: inline-block;
+            width: 100%;
+        }
+        &::after {
+            font-family: 'Material Icons';
+            content: "add_circle_outline";
+        }
+    }
+}
