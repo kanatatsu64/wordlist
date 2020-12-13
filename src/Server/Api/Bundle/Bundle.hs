@@ -2,52 +2,58 @@
 
 module Server.Api.Bundle.Bundle (
     createHandler,
+    updateHandler,
     getHandler,
-    uploadHandler
+    deleteHandler
 ) where
 
 import Prelude hiding ( lookup, lines )
-import Network.Wai.Parse ( FileInfo (..) )
 
-import Csv ( parseCsv )
-import Bundle ( Bundle (..), save, load, runAddCards )
-import Composable ( Composable (..) )
-import SQL ( execRuntime )
-import Plugins.Base ( getPluginById )
 import UUID ( getRandom )
-import Utils ( maybeToFail, lines )
-import qualified Card ( Card (..), runSave )
-import Server.Types ( decode, lazyDecode, lookup )
+import Convertible ( convert, failConvert, ConvertError (..) )
+import Server.Bundle ( load, delete, runDelete, runSave, runAddCards )
+import Server.Json ( Json (..), jsonify, parse )
+import Server.SQL ( execRuntime )
+import Server.Types ( lookup, lazyDecode )
+import Server.Utils ( body )
 import Server.Handler ( handler )
-import Server.Response ( uploader, ok )
-import Server.Api.Response ( bundle )
+import Server.Response ( ok, json )
+import Server.Api.Bundle.Types ( AbbrBundle (..) )
 
-createHandler = handler $ \params -> do
-    _name <- lookup "name" params
-    let name = decode _name
-    _desc <- lookup "desc" params
-    let desc = decode _desc
+createHandler = handler $ \request -> do
     uuid <- getRandom
-    let _bundle = Bundle uuid name desc []
-    save _bundle
+    abbr <- flip body request $ \bstr ->
+        let json = Json $ lazyDecode bstr in
+            case parse @AbbrBundle json of
+                Right abbr -> return $ abbr {abbr_bundleid = uuid }
+                Left error -> fail $ convErrorMessage error
+    let bundle = convert abbr
+    execRuntime $ do
+        runSave bundle
+        runAddCards bundle (abbr_cardids abbr)
+    json $ jsonify uuid
+
+updateHandler = handler $ \request -> do
+    abbr <- flip body request $ \bstr ->
+        let json = Json $ lazyDecode bstr in
+            case parse @AbbrBundle json of
+                Right abbr -> return abbr
+                Left error -> fail $ convErrorMessage error
+    let bundle = convert abbr
+    execRuntime $ do
+        runDelete (abbr_bundleid abbr)
+        runSave bundle
+        runAddCards bundle (abbr_cardids abbr)
     ok
 
 getHandler = handler $ \params -> do
     _bundleid <- lookup "id" params
-    bundleid <- maybeToFail "failed to compose bundleid" $ compose $ decode _bundleid
+    bundleid <- failConvert _bundleid
     _bundle <- load bundleid
-    bundle _bundle
+    json $ jsonify _bundle
 
-uploadHandler = handler $ \params request -> do
+deleteHandler = handler $ \params -> do
     _bundleid <- lookup "id" params
-    bundleid <- maybeToFail "failed to compose bundleid" $ compose $ decode _bundleid
-    _bundle <- load bundleid
-    _pluginid <- lookup "plugin" params
-    pluginid <- maybeToFail "failed to compose pluginid" $ compose $ decode _pluginid
-    _plugin <- getPluginById pluginid
-    flip uploader request \(_, info) -> do
-        let contents = lazyDecode $ fileContent info
-        cards <- parseCsv _plugin (lines contents)
-        execRuntime do
-            mapM_ Card.runSave cards
-            runAddCards _bundle (map Card.cardid cards)
+    bundleid <- failConvert _bundleid
+    delete bundleid
+    ok

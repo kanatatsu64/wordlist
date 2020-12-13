@@ -2,13 +2,14 @@ module Server.Api.Bundle.Router (
     router
 ) where
 
-import Server.Internal.Router ( get, post )
+import Server.Internal.Router ( get, post, put, delete )
 
 import qualified Server.Api.Bundle.List as List ( getNameList )
-import Server.Api.Bundle.Bundle ( createHandler, getHandler, uploadHandler )
+import Server.Api.Bundle.Bundle ( createHandler, updateHandler, getHandler, deleteHandler )
 
 router = do
     post "" createHandler
-    get ":id" getHandler
-    post ":id" uploadHandler
+    put "" updateHandler
     get "list/name" List.getNameList
+    get ":id" getHandler
+    delete ":id" deleteHandler
