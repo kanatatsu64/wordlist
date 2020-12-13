@@ -1,9 +1,8 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE ExistentialQuantification #-}
 
 module Server.SQL (
-    withConnection,
-    contConnection,
     execRuntime,
     uuidDataType,
     serialDataType,
@@ -15,36 +14,38 @@ module Server.SQL (
     module Server.Internal.SQL
 ) where
 
-import Database.HDBC.Sqlite3 ( connectSqlite3, Connection )
+import Control.Monad.IO.Class
 
-import Config ( AppConfig (..), getsConfig )
+import Env ( AppEnv (..), contEnv )
 import Convertible ( Convertible (..) )
 import UUID ( UUID )
 import Serial ( Serial )
-import Utils ( execCont, cont )
+import Utils ( execContT )
 import Server.Internal.SQL
 
-connect :: FilePath -> IO Connection
-connect = connectSqlite3
-
-withConnection :: FilePath ->
-                  (Connection -> IO a) ->
-                  IO a
-withConnection path callback = do
-    connection <- connect path
-    result <- callback connection
-    disconnect connection
-    return result
-
-contConnection path = cont $ withConnection path
+{-
+   Due to HDBC sqlite3 driver's bug in clone function,
+   serialize multiple connections by hand instead of
+   using clone.
+-}
 
 execRuntime :: (forall c. IConnection c => Runtime c a) -> IO a
+execRuntime runtime = execContT do
+    AppEnv conn <- contEnv
+    trans <- contTransaction conn
+    liftIO $ runRuntime runtime trans
+
+{-
+execRuntime :: (forall c. IConnection c => Runtime c a) -> IO a
 execRuntime runtime = do
-    db <- getsConfig cf_database
-    execCont do
-        conn <- contConnection db
-        trans <- contTransaction conn
-        return $ runRuntime runtime trans
+    wconn <- execContT do
+        AppEnv base <- contEnv
+        conn <- liftIO $ clone base
+        return $ ConnWrapper conn
+    execContT do
+        trans <- contTransaction wconn
+        liftIO $ runRuntime runtime trans
+-}
 
 uuidDataType :: DataType
 uuidDataType = "String"

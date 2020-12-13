@@ -52,15 +52,14 @@ module Server.Internal.SQL (
 import Prelude hiding ( lookup )
 import qualified Prelude
 
-import Control.Monad.Cont
 import Control.Monad.Reader
 import Control.Monad.Writer
 import Database.HDBC
 
 import Convertible ( Convertible (..), ConvertError (..) )
-import Utils ( maybeToFail )
+import Utils ( maybeToFail, contT )
 
-contTransaction conn = cont $ withTransaction conn
+contTransaction conn = contT $ withTransaction conn
 
 existTable :: IConnection conn => conn -> String -> IO Bool
 existTable conn name = elem name <$> getTables conn
