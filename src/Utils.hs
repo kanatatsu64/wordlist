@@ -3,6 +3,7 @@
 
 module Utils (
     contFile,
+    contT,
     cont,
     execContT,
     execCont,
@@ -40,6 +41,9 @@ execContT c = runContT c return
 
 execCont :: Cont r r -> r
 execCont c = runIdentity $ execContT c
+
+contT :: ((a -> m r) -> m r) -> ContT r m a
+contT = ContT
 
 split :: Char -> String -> [String]
 split delim str = reverse $ execState (loop str) [""]

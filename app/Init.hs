@@ -3,14 +3,25 @@ module Init (
 ) where
 
 import Control.Monad
+import Control.Concurrent
+import Database.HDBC.Sqlite3 ( connectSqlite3 )
 
+import Env ( AppEnv (..), envRef )
 import Utils ( field )
 import Server.SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
 import Server.Bundle ( BundleSchema, BundleToCardSchema )
 import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
+import Config ( database )
 
 initApp :: IO ()
-initApp = initDB
+initApp = do
+    initEnv
+    initDB
+
+initEnv :: IO ()
+initEnv = do
+    conn <- connectSqlite3 database
+    putMVar envRef (AppEnv conn)
 
 initDB :: IO ()
 initDB = execRuntime do

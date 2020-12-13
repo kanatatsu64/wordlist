@@ -3,8 +3,10 @@ module TestInit (
 ) where
 
 import Control.Monad
+import Control.Concurrent
+import Database.HDBC.Sqlite3 ( connectSqlite3 )
 
-import Config ( AppConfig (..), modifyConfig )
+import Env ( AppEnv (..), envRef )
 import TestConfig ( database )
 import Utils ( field )
 import Server.SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
@@ -13,12 +15,13 @@ import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
 
 initTest :: IO ()
 initTest = do
-    initConfig
+    initEnv
     initDB
 
-initConfig :: IO ()
-initConfig = do
-    modifyConfig (\config -> config { cf_database = database })
+initEnv :: IO ()
+initEnv = do
+    conn <- connectSqlite3 database
+    putMVar envRef (AppEnv conn)
 
 initDB :: IO ()
 initDB = execRuntime do

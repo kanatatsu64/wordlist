@@ -41,7 +41,6 @@ library:
   - directory
   - uuid
   - HDBC
-  - HDBC-sqlite3
   - convertible
   - sort
   - parsec
@@ -56,6 +55,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - wordlist
+    - HDBC-sqlite3
 
 tests:
   wordlist-unit-test:
@@ -82,4 +82,5 @@ tests:
     - tasty-hunit
     - wai
     - wai-extra
+    - HDBC-sqlite3
     - sort
