@@ -5,6 +5,7 @@ import Modal from 'react-modal'
 import { BundleID, Bundle, Card } from 'Types'
 import { load } from 'Api/Bundle'
 import { Center } from 'Lib/Align'
+import { Insert } from 'Lib/Insert'
 import { Sequence } from 'Lib/Sequence'
 import { Dial } from 'Lib/Dial'
 import { Loading } from 'Lib/Loading'
@@ -61,6 +62,10 @@ export const BundlePage: React.FC<PropsType> = props => {
         updateBundle()
     }
 
+    const onInsert = (index: number) => () => {
+        alert('insert after ' + index)
+    }
+
     const onSelect = (card: Card) => {
         history.push(`/card/${card.cardid}`)
     }
@@ -78,15 +83,23 @@ export const BundlePage: React.FC<PropsType> = props => {
             <Center>
             <table>
                 <tbody>
+                    <tr>
+                        <td colSpan={2}><Insert onClick={ onInsert(mod(from - 1, cards.length)) }></Insert></td>
+                    </tr>
                     <Sequence from={ from } count={ 3 }>
-                        {cards.map(card => {
+                        {cards.map((card, index) => {
                             const { word, meaning, cardid } = card
                             const onClick = () => onSelect(card)
                             return (
-                                <tr key={ cardid } onClick={ onClick }>
-                                    <td><Center>{ word }</Center></td>
-                                    <td><Center>{ meaning }</Center></td>
-                                </tr>
+                                <React.Fragment key={ cardid }>
+                                    <tr onClick={ onClick }>
+                                        <td><Center>{ word }</Center></td>
+                                        <td><Center>{ meaning }</Center></td>
+                                    </tr>
+                                    <tr> 
+                                        <td colSpan={2}><Insert onClick={ onInsert(index) }></Insert></td>
+                                    </tr>
+                                </React.Fragment>
                             )
                         })}
                     </Sequence>
