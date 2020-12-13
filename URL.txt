@@ -1,17 +1,23 @@
 /   GET: トップページを表示
 +---/bundle
-|      +------/table/:name  GET: Bundleのカード一覧を表示
-|      +------/learn/:name  GET: Bundle学習ページの表示
+|      +------/:id                   Bundleのカード一覧を表示
+|      +------/learn/:id             Bundle学習ページを表示
++---/card
+|      +------/:id                   Cardを表示
 |
 +---/api
       +----/bundle                   POST: Bundleを追加
+      |       |                      PUT: Bundleを更新
       |       +------/list
       |       |         +----/info   GET: Bundleの情報をすべて取得
       |       +------/:id            GET: Bundleを取得
-      |                              POST: Bundleに追加
-      +----/card
-      |       +------/:id            GET: Cardを取得
+      |                              DELETE: Bundleを削除
       |
+      +----/card                     POST: Cardを追加
+      |       |                      PUT: Cardを更新
+      |       +------/list           POST: Cardを複数追加
+      |       +------/:id            GET: Cardを取得
+      |                              DELETE: Cardを削除
       +----/plugin
               +------/info
                         +----/:id    GET: Pluginの情報を取得
