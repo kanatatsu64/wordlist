@@ -10,6 +10,9 @@ module Server.Json (
     Ary (..),
     Rec (..),
     Dict (..),
+    JObj (..),
+    JKey (..),
+    JRec (..),
 
     lookup
 ) where
