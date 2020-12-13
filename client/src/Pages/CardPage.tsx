@@ -84,7 +84,7 @@ export const CardPage: React.FC<PropsType> = props => {
                     </div>
                     <div>
                         <button onClick={ onDelete }>Yes</button>
-                        <button onClick={ closeDeleteModal }>Not</button>
+                        <button onClick={ closeDeleteModal }>No</button>
                     </div>
                 </Modal>
             </>
