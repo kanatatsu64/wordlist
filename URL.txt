@@ -13,6 +13,7 @@
       |       +------/:id            GET: Bundleを取得
       |                 |            DELETE: Bundleを削除
       |                 +----/cards  POST: CardをBundleに複数追加
+      |                              DELETE: BundleからCardを複数削除
       |
       +----/card                     POST: Cardを追加
       |       |                      PUT: Cardを更新
