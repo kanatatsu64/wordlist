@@ -10,7 +10,6 @@ import Test.Tasty.HUnit
 import Serial
 import UUID
 import Server.Card
-import TestUtils ( execRuntime )
 
 test_all = testGroup "Card" [
         test_saveAndLoad
@@ -31,8 +30,8 @@ test_saveAndLoad = testCase "save and load" do
                 Example "zwei kleinen Kinder" "two small kids"
             ]
         card = Card _cardid _pluginid _language _word _meaning _attrs _note _examples
-    execRuntime $ runSave card
-    card' <- execRuntime $ runLoad (cardid card)
+    save card
+    card' <- load (cardid card)
 
     assertEqual "cardid" (cardid card) (cardid card')
     assertEqual "pluginid" (pluginid card) (pluginid card')
