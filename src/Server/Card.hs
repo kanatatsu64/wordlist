@@ -7,9 +7,13 @@ module Server.Card (
     cardTable,
     attrTable,
     exampleTable,
+    runExist,
     runSave,
+    runDelete,
     runLoad,
+    exist,
     save,
+    delete,
     load,
     module Card
 ) where
@@ -38,6 +42,7 @@ import Server.SQL (
         runInsert,
         runSelect
     )
+import qualified Server.SQL as SQL
 import Utils ( withIndex, same, for, maybeToFail )
 
 cardTable :: Table
@@ -186,6 +191,14 @@ fromSchemas cardSchema attrSchemas exampleSchemas = do
                             return $ Example _original _translation
     return $ Card _cardid _pluginid _language _word _meaning _attrs _note _examples
 
+runExist :: IConnection conn => CardID -> Runtime conn Bool
+runExist _cardid = do
+        let val = toSql _cardid
+        SQL.runExist cardTable ("id = ?", [val])
+
+exist :: CardID -> IO Bool
+exist _cardid = execRuntime $ runExist _cardid
+
 runSave :: IConnection conn => Card -> Runtime conn ()
 runSave card = do
         let cardSchema = toCardSchema card
@@ -201,6 +214,17 @@ runSave card = do
 
 save :: Card -> IO ()
 save card = execRuntime $ runSave card
+
+runDelete :: IConnection conn => CardID -> Runtime conn ()
+runDelete _cardid = do
+        let val = toSql _cardid
+        SQL.runDelete cardTable ("id = ?", [val])
+        SQL.runDelete attrTable ("cardid = ?", [val])
+        SQL.runDelete exampleTable ("cardid = ?", [val])
+        return ()
+
+delete :: CardID -> IO ()
+delete _cardid = execRuntime $ runDelete _cardid
 
 runLoad :: IConnection conn => CardID -> Runtime conn Card
 runLoad _cardid = do

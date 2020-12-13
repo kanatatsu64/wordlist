@@ -1,15 +1,20 @@
 module Server.Bundle (
     BundleInfo,
+    getInfo,
     BundleSchema,
     BundleToCardSchema,
     bundleTable,
     bundleToCardTable,
+    runExist,
     runSave,
+    runDelete,
     runLoad,
     runLoadInfos,
     runAddCard,
     runAddCards,
+    exist,
     save,
+    delete,
     load,
     loadInfos,
     addCard,
@@ -37,6 +42,7 @@ import Server.SQL (
         runSelect,
         runSelectAll
     )
+import qualified Server.SQL as SQL
 import Utils ( maybeToFail, same, contentEqual )
 
 bundleTable :: Table
@@ -119,6 +125,14 @@ fromSchemas bundleSchema bundleToCardSchemas cards = do
         _desc = bs_desc bundleSchema
     return $ Bundle _bundleid _name _desc cards
 
+runExist :: IConnection conn => BundleID -> Runtime conn Bool
+runExist _bundleid = do
+        let val = toSql _bundleid
+        SQL.runExist bundleTable ("id = ?", [val])
+
+exist :: BundleID -> IO Bool
+exist _bundleid = execRuntime $ runExist _bundleid
+
 runSave :: IConnection conn => Bundle -> Runtime conn ()
 runSave bundle = do
         let bundleSchema = toBundleSchema bundle
@@ -133,6 +147,16 @@ runSave bundle = do
 
 save :: Bundle -> IO ()
 save bundle = execRuntime $ runSave bundle
+
+runDelete :: IConnection conn => BundleID -> Runtime conn ()
+runDelete _bundleid = do
+        let val = toSql _bundleid
+        SQL.runDelete bundleTable ("id = ?", [val])
+        SQL.runDelete bundleToCardTable ("bundleid = ?", [val])
+        return ()
+
+delete :: BundleID -> IO ()
+delete _bundleid = execRuntime $ runDelete _bundleid
 
 runLoad :: IConnection conn => BundleID -> Runtime conn Bundle
 runLoad _bundleid = do
@@ -158,6 +182,9 @@ load :: BundleID -> IO Bundle
 load _bundleid = execRuntime $ runLoad _bundleid
 
 type BundleInfo = (BundleID, String, String)
+
+getInfo :: Bundle -> BundleInfo
+getInfo bundle = (bundleid bundle, name bundle, desc bundle)
 
 runLoadInfos :: IConnection conn => Runtime conn [BundleInfo]
 runLoadInfos = do
