@@ -6,8 +6,7 @@ module Server.Api.Bundle.BundleTest (
     test_createHandler,
     test_updateHandler,
     test_getHandler,
-    test_deleteHandler,
-    test_addHandler
+    test_deleteHandler
 ) where
 
 import Test.Tasty
@@ -20,14 +19,13 @@ import Server.Bundle ( Bundle (..) )
 import qualified Server.Bundle as Bundle
 import qualified Server.Card as Card
 import TestUtils ( runAppTest, getCardMock, getBundleMock, compile, clean, getTestUUID, getTestUUID2, assertBundleEqual )
-import Server.Api.Bundle.Bundle ( createHandler, updateHandler, getHandler, deleteHandler, addHandler )
+import Server.Api.Bundle.Bundle ( createHandler, updateHandler, getHandler, deleteHandler )
 
 test_all = testGroup "Bundle" [
         test_createHandler,
         test_updateHandler,
         test_getHandler,
-        test_deleteHandler,
-        test_addHandler
+        test_deleteHandler
     ]
 
 test_createHandler = testCase "createHandler" do
@@ -128,26 +126,3 @@ test_deleteHandler = testCase "deleteHandler" do
     
     exist <- Bundle.exist uuid
     assertBool "bundle is not deleted" (not exist)
-
-test_addHandler = testCase "addHandler" do
-    clean
-    uuid <- getTestUUID
-    card <- getCardMock uuid "test card"
-    bundle <- getBundleMock uuid "test name" [card]
-    Bundle.save bundle
-
-    uuid2 <- getTestUUID2
-    card2 <- getCardMock uuid2 "test card2"
-    Card.save card2
-
-    let app = compile [("id", Just $ convert uuid)] addHandler
-    runAppTest app do
-        let Json body = jsonify $ Ary [uuid2]
-            sreq = SRequest defaultRequest (convert body)
-        sres <- srequest sreq
-        assertStatus 200 sres
-
-    actual <- Bundle.load uuid    
-    let expected = bundle { cards = [card, card2] }
-        msg = "cards are not correctly added"
-    assertBundleEqual msg expected actual

@@ -12,6 +12,8 @@ module Server.Bundle (
     runLoadInfos,
     runAddCard,
     runAddCards,
+    runDeleteCard,
+    runDeleteCards,
     exist,
     save,
     delete,
@@ -19,6 +21,8 @@ module Server.Bundle (
     loadInfos,
     addCard,
     addCards,
+    deleteCard,
+    deleteCards,
     module Bundle
 ) where
 
@@ -213,3 +217,20 @@ addCard _bundleid _cardid = execRuntime $ runAddCard _bundleid _cardid
 
 addCards :: BundleID -> [CardID] -> IO ()
 addCards _bundleid _cardids = execRuntime $ runAddCards _bundleid _cardids
+
+runDeleteCard :: IConnection conn => BundleID -> CardID -> Runtime conn ()
+runDeleteCard _bundleid _cardid = do
+        let val1 = toSql _bundleid
+            val2 = toSql _cardid
+        void $ SQL.runDelete bundleToCardTable ("bundleid = ? AND cardid = ?", [val1, val2])
+
+runDeleteCards :: IConnection conn => BundleID -> [CardID] -> Runtime conn ()
+runDeleteCards _bundleid _cardids = sequence_ do
+        _cardid <- _cardids
+        return $ runDeleteCard _bundleid _cardid
+
+deleteCard :: BundleID -> CardID -> IO ()
+deleteCard _bundleid _cardid = execRuntime $ runDeleteCard _bundleid _cardid
+
+deleteCards :: BundleID -> [CardID] -> IO ()
+deleteCards _bundleid _cardids = execRuntime $ runDeleteCards _bundleid _cardids
