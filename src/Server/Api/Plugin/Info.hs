@@ -7,11 +7,9 @@ module Server.Api.Plugin.Info (
 import Prelude hiding ( lookup )
 
 import Plugin ( Plugin (..) )
-import Serializable ( Serializable (..) )
-import Composable ( Composable (..) )
-import Utils ( maybeToFail )
+import Convertible ( failConvert )
 import Plugins.Base ( getPluginById )
-import Server.Json ( Json (..), Dict (..), Rec (..) )
+import Server.Json ( jsonify, Dict (..), Rec (..) )
 import Server.Response ( json )
 import Server.Handler ( Handler, handler )
 import Server.Types ( decode, lookup )
@@ -19,10 +17,10 @@ import Server.Types ( decode, lookup )
 getHandler :: Handler
 getHandler = handler $ \params -> do
     __pluginid <- lookup "id" params
-    _pluginid <- maybeToFail "failed to parse pluginid" $ compose $ decode __pluginid
+    _pluginid <- failConvert $ decode __pluginid
     plugin <- getPluginById _pluginid
     json $ jsonify $ Dict [
-            Rec "pluginid" $ serialize (pluginid plugin),
+            Rec "pluginid" $ pluginid plugin,
             Rec "name" $ name plugin,
             Rec "desc" $ desc plugin
         ]
