@@ -10,10 +10,12 @@ module Server.Card (
     runExist,
     runSave,
     runDelete,
+    runUpdate,
     runLoad,
     exist,
     save,
     delete,
+    update,
     load,
     module Card
 ) where
@@ -220,6 +222,17 @@ runDelete _cardid = do
 
 delete :: CardID -> IO ()
 delete _cardid = execRuntime $ runDelete _cardid
+
+runUpdate :: IConnection conn => Card -> Runtime conn ()
+runUpdate card = do
+        let val = toSql (cardid card)
+        SQL.runDelete cardTable ("id = ?", [val])
+        SQL.runDelete attrTable ("cardid = ?", [val])
+        SQL.runDelete exampleTable ("cardid = ?", [val])
+        runSave card
+
+update :: Card -> IO ()
+update card = execRuntime $ runUpdate card
 
 runLoad :: IConnection conn => CardID -> Runtime conn Card
 runLoad _cardid = do

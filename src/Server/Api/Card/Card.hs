@@ -11,7 +11,7 @@ import Prelude hiding ( lookup )
 
 import Convertible ( failConvert, ConvertError (..) )
 import UUID ( getRandom )
-import Server.Card ( Card (..), load, delete, runSave, runDelete )
+import Server.Card ( Card (..), load, delete, update, runSave )
 import Server.Json ( Json (..), parse, jsonify )
 import Server.SQL ( execRuntime )
 import Server.Types ( decode, lazyDecode, lookup )
@@ -44,9 +44,7 @@ updateHandler = handler $ \request -> do
             case parse json of
                 Right card -> return card
                 Left error -> fail $ convErrorMessage error
-    execRuntime do
-        runDelete (cardid card)
-        runSave card
+    update card
     ok
 
 deleteHandler :: Handler
