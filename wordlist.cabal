@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f10007980c707f1944e311f0b8cdf52b7d4b13d98c48c4208f8cb0ab1c5e87a4
+-- hash: 88dfd4a4dc77f9942f2bd39d673ec5d9724b9159c1d207259fda43a758afc22c
 
 name:           wordlist
 version:        0.1.0.0
@@ -29,7 +29,8 @@ library
   exposed-modules:
       Bundle
       Card
-      Composable
+      Config
+      Convertible
       Csv
       Directory
       Examples.CsvToHtml
@@ -46,28 +47,32 @@ library
       Plugins.German.Plugin
       Plugins.German.Utils
       Plugins.German.Verb
-      Serializable
+      Serial
       Server.Api.Bundle.Bundle
       Server.Api.Bundle.List
       Server.Api.Bundle.Router
+      Server.Api.Bundle.Types
       Server.Api.Card.Card
+      Server.Api.Card.List
       Server.Api.Card.Router
-      Server.Api.Handler
       Server.Api.Plugin.Info
       Server.Api.Plugin.Router
-      Server.Api.Response
       Server.Api.Router
-      Server.Api.Types
       Server.Application
       Server.Base
+      Server.Bundle
+      Server.Card
       Server.Handler
       Server.Internal.Handler
+      Server.Internal.Json
       Server.Internal.Router
+      Server.Internal.SQL
       Server.Json
       Server.Response
       Server.Router
+      Server.SQL
       Server.Types
-      SQL
+      Server.Utils
       Types
       Utils
       UUID
@@ -85,6 +90,7 @@ library
     , directory
     , http-types
     , mtl
+    , parsec
     , sort
     , text
     , transformers
@@ -108,7 +114,38 @@ executable wordlist-exe
     , wordlist
   default-language: Haskell2010
 
-test-suite wordlist-test
+test-suite wordlist-integration-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      CardTest
+      Server.Api.Bundle.BundleTest
+      Server.Api.Bundle.ListTest
+      Server.Api.Bundle.Spec
+      Server.Api.Card.CardTest
+      Server.Api.Card.ListTest
+      Server.Api.Card.Spec
+      Server.Api.Spec
+      Server.Spec
+      TestConfig
+      TestInit
+      TestUtils
+      Paths_wordlist
+  hs-source-dirs:
+      test/integration
+  default-extensions: BlockArguments LambdaCase TypeApplications
+  ghc-options: -rtsopts
+  build-depends:
+      base >=4.7 && <5
+    , sort
+    , tasty
+    , tasty-hunit
+    , wai
+    , wai-extra
+    , wordlist
+  default-language: Haskell2010
+
+test-suite wordlist-unit-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
@@ -121,16 +158,21 @@ test-suite wordlist-test
       Plugins.German.Spec
       Plugins.German.VerbTest
       Plugins.Spec
-      SQLTest
+      Server.Internal.JsonTest
+      Server.Internal.Spec
+      Server.Internal.SQLTest
+      Server.Spec
       TestUtils
       UtilsTest
       Paths_wordlist
   hs-source-dirs:
-      test
+      test/unit
   default-extensions: BlockArguments LambdaCase TypeApplications
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
+    , parsec
+    , sort
     , tasty
     , tasty-hunit
     , wordlist
