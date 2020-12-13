@@ -37,11 +37,13 @@ module Server.Internal.SQL (
     delete,
     createDatabase,
     createTable,
+    runExist,
     runSelect,
     runSelectAll,
     runInsert,
     runUpdate,
     runDelete,
+    runDeleteAll,
     runCreateDatabase,
     runCreateTable,
     module Database.HDBC
@@ -88,7 +90,7 @@ runQuery :: IConnection conn => SQL -> [SqlValue] -> [Column] -> Runtime conn [[
 runQuery sql vals cols = toRuntime $ go sql vals cols
     where
         go sql vals cols conn = do
-            rows <- quickQuery conn sql vals
+            rows <- quickQuery' conn sql vals
             return $ zip cols <$> rows
 
 runExistTable :: IConnection conn => Table -> Runtime conn Bool
@@ -238,6 +240,17 @@ createTable table defs = do
             return $ part1 ++ "," ++ part2
         toDefs _ = fail "definitions cannot be empty"
 
+runExist :: IConnection conn => Table -> Condition -> Runtime conn Bool
+runExist table cond@(_, cvals) = do
+    sql <- buildSQL $ do
+                select ["COUNT(*)"]
+                from table
+                where_ cond
+    recs <- runQuery sql cvals ["count"]
+    let ("count", sval) = head . head $ recs
+        val = fromSql @Int sval
+    return $ val > 0
+
 runSelect :: IConnection conn => Table -> [Column] -> Condition-> Runtime conn [[Record]]
 runSelect table cols cond@(_,cvals) = do
     sql <- buildSQL $ do
@@ -278,6 +291,11 @@ runDelete table cond@(_,cvals) = do
                 delete table
                 where_ cond
     runSQL sql cvals
+
+runDeleteAll :: IConnection conn => Table -> Runtime conn Integer
+runDeleteAll table = do
+    sql <- buildSQL $ delete table
+    runSQL sql []
 
 runCreateDatabase :: IConnection conn => Database -> Runtime conn Integer
 runCreateDatabase database = do
