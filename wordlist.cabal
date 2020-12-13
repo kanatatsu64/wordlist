@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 88dfd4a4dc77f9942f2bd39d673ec5d9724b9159c1d207259fda43a758afc22c
+-- hash: d7018495c75c8c1de743d1578c6147825d573d83f55f2e018af3d1aa78c6435e
 
 name:           wordlist
 version:        0.1.0.0
@@ -49,6 +49,7 @@ library
       Plugins.German.Verb
       Serial
       Server.Api.Bundle.Bundle
+      Server.Api.Bundle.Cards
       Server.Api.Bundle.List
       Server.Api.Bundle.Router
       Server.Api.Bundle.Types
@@ -120,6 +121,7 @@ test-suite wordlist-integration-test
   other-modules:
       CardTest
       Server.Api.Bundle.BundleTest
+      Server.Api.Bundle.CardsTest
       Server.Api.Bundle.ListTest
       Server.Api.Bundle.Spec
       Server.Api.Card.CardTest
