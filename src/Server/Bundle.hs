@@ -35,7 +35,6 @@ import qualified Server.Card as Card
 import Server.SQL (
         IConnection,
         ISchema (..),
-        Table,
         Runtime,
         uuidDataType,
         columns,
@@ -44,16 +43,12 @@ import Server.SQL (
         toSql,
         runInsert,
         runSelect,
-        runSelectAll
+        runSelectAll,
+        bundleTable,
+        bundleToCardTable
     )
 import qualified Server.SQL as SQL
 import Utils ( maybeToFail, same, contentEqual )
-
-bundleTable :: Table
-bundleTable = "Bundle"
-
-bundleToCardTable :: Table
-bundleToCardTable = "BundleToCard"
 
 data BundleSchema = BundleSchema {
     bs_bundleid :: BundleID,

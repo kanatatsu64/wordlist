@@ -34,25 +34,19 @@ import Server.SQL (
         execRuntime,
         Runtime,
         DataType,
-        Table,
         columns,
         lookup,
         SqlValue,
         toSql,
         runInsert,
-        runSelect
+        runSelect,
+        cardTable,
+        attrTable,
+        exampleTable,
+        bundleToCardTable 
     )
 import qualified Server.SQL as SQL
 import Utils ( withIndex, same, for, maybeToFail )
-
-cardTable :: Table
-cardTable = "Card"
-
-attrTable :: Table
-attrTable = "Attr"
-
-exampleTable :: Table
-exampleTable = "Example"
 
 languageDataType :: DataType
 languageDataType = "String"
@@ -221,6 +215,7 @@ runDelete _cardid = do
         SQL.runDelete cardTable ("id = ?", [val])
         SQL.runDelete attrTable ("cardid = ?", [val])
         SQL.runDelete exampleTable ("cardid = ?", [val])
+        SQL.runDelete bundleToCardTable ("cardid = ?", [val])
         return ()
 
 delete :: CardID -> IO ()

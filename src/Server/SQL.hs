@@ -7,6 +7,11 @@ module Server.SQL (
     execRuntime,
     uuidDataType,
     serialDataType,
+    bundleTable,
+    bundleToCardTable,
+    cardTable,
+    attrTable,
+    exampleTable,    
     module Server.Internal.SQL
 ) where
 
@@ -58,3 +63,18 @@ instance Convertible SqlValue Serial where
 
 instance Convertible Serial SqlValue where
     safeConvert sval = safeConvert sval >>= safeConvert @String
+
+bundleTable :: Table
+bundleTable = "Bundle"
+
+bundleToCardTable :: Table
+bundleToCardTable = "BundleToCard"
+
+cardTable :: Table
+cardTable = "Card"
+
+attrTable :: Table
+attrTable = "Attr"
+
+exampleTable :: Table
+exampleTable = "Example"
