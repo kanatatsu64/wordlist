@@ -2,11 +2,9 @@
 {-# LANGUAGE RankNTypes #-}
 
 module Server.SQL (
-    database,
     withConnection,
     contConnection,
     execRuntime,
-    execRuntimeOn,
     uuidDataType,
     serialDataType,
     module Server.Internal.SQL
@@ -14,14 +12,12 @@ module Server.SQL (
 
 import Database.HDBC.Sqlite3 ( connectSqlite3, Connection )
 
+import Config ( AppConfig (..), getsConfig )
 import Convertible ( Convertible (..) )
 import UUID ( UUID )
 import Serial ( Serial )
 import Utils ( execCont, cont )
 import Server.Internal.SQL
-
-database :: Database
-database = "resource/database.db"
 
 connect :: FilePath -> IO Connection
 connect = connectSqlite3
@@ -38,15 +34,12 @@ withConnection path callback = do
 contConnection path = cont $ withConnection path
 
 execRuntime :: (forall c. IConnection c => Runtime c a) -> IO a
-execRuntime = execRuntimeOn database
-
-execRuntimeOn :: FilePath ->
-                 (forall c. IConnection c => Runtime c a) ->
-                 IO a
-execRuntimeOn path runtime = execCont do
-    conn <- contConnection path
-    trans <- contTransaction conn
-    return $ runRuntime runtime trans
+execRuntime runtime = do
+    db <- getsConfig cf_database
+    execCont do
+        conn <- contConnection db
+        trans <- contTransaction conn
+        return $ runRuntime runtime trans
 
 uuidDataType :: DataType
 uuidDataType = "String"
