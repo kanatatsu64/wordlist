@@ -11,7 +11,8 @@
       |       +------/list
       |       |         +----/info   GET: Bundleの情報をすべて取得
       |       +------/:id            GET: Bundleを取得
-      |                              DELETE: Bundleを削除
+      |                 |            DELETE: Bundleを削除
+      |                 +----/cards  POST: CardをBundleに複数追加
       |
       +----/card                     POST: Cardを追加
       |       |                      PUT: Cardを更新

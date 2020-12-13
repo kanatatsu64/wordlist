@@ -198,19 +198,18 @@ runLoadInfos = do
 loadInfos :: IO [BundleInfo]
 loadInfos = execRuntime runLoadInfos
 
-runAddCard :: IConnection conn => Bundle -> CardID -> Runtime conn ()
-runAddCard bundle _cardid = do
-        let _bundleid = bundleid bundle
-            schema = BundleToCardSchema _bundleid _cardid
+runAddCard :: IConnection conn => BundleID -> CardID -> Runtime conn ()
+runAddCard _bundleid _cardid = do
+        let schema = BundleToCardSchema _bundleid _cardid
         void $ runInsert bundleToCardTable (toRecords schema)
 
-runAddCards :: IConnection conn => Bundle -> [CardID] -> Runtime conn ()
-runAddCards bundle _cardids = sequence_ do
+runAddCards :: IConnection conn => BundleID -> [CardID] -> Runtime conn ()
+runAddCards _bundleid _cardids = sequence_ do
         _cardid <- _cardids
-        return $ runAddCard bundle _cardid
+        return $ runAddCard _bundleid _cardid
 
-addCard :: Bundle -> CardID -> IO ()
-addCard bundle _cardid = execRuntime $ runAddCard bundle _cardid
+addCard :: BundleID -> CardID -> IO ()
+addCard _bundleid _cardid = execRuntime $ runAddCard _bundleid _cardid
 
-addCards :: Bundle -> [CardID] -> IO ()
-addCards bundle _cardids = execRuntime $ runAddCards bundle _cardids
+addCards :: BundleID -> [CardID] -> IO ()
+addCards _bundleid _cardids = execRuntime $ runAddCards _bundleid _cardids

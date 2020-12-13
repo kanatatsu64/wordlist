@@ -4,15 +4,16 @@ module Server.Api.Bundle.Bundle (
     createHandler,
     updateHandler,
     getHandler,
-    deleteHandler
+    deleteHandler,
+    addHandler
 ) where
 
 import Prelude hiding ( lookup, lines )
 
 import UUID ( getRandom )
 import Convertible ( convert, failConvert, ConvertError (..) )
-import Server.Bundle ( load, delete, runDelete, runSave, runAddCards )
-import Server.Json ( Json (..), jsonify, parse )
+import Server.Bundle ( Bundle (..), load, delete, runDelete, runSave, runAddCards, addCards )
+import Server.Json ( Json (..), Ary (..), jsonify, parse )
 import Server.SQL ( execRuntime )
 import Server.Types ( lookup, lazyDecode )
 import Server.Utils ( body )
@@ -30,7 +31,7 @@ createHandler = handler $ \request -> do
     let bundle = convert abbr
     execRuntime $ do
         runSave bundle
-        runAddCards bundle (abbr_cardids abbr)
+        runAddCards (bundleid bundle) (abbr_cardids abbr)
     json $ jsonify uuid
 
 updateHandler = handler $ \request -> do
@@ -43,7 +44,7 @@ updateHandler = handler $ \request -> do
     execRuntime $ do
         runDelete (abbr_bundleid abbr)
         runSave bundle
-        runAddCards bundle (abbr_cardids abbr)
+        runAddCards (bundleid bundle) (abbr_cardids abbr)
     ok
 
 getHandler = handler $ \params -> do
@@ -56,4 +57,15 @@ deleteHandler = handler $ \params -> do
     _bundleid <- lookup "id" params
     bundleid <- failConvert _bundleid
     delete bundleid
+    ok
+
+addHandler = handler $ \params request -> do
+    _bundleid <- lookup "id" params
+    bundleid <- failConvert _bundleid
+    Ary cardids <- flip body request $ \bstr ->
+        let json = Json $ lazyDecode bstr in
+            case parse json of
+                Right ids -> return ids
+                Left error -> fail $ convErrorMessage error
+    addCards bundleid cardids
     ok
