@@ -4,21 +4,29 @@ module TestInit (
 
 import Control.Monad
 
-import Server.SQL ( runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
+import Config ( AppConfig (..), modifyConfig )
+import TestConfig ( database )
+import Utils ( field )
+import Server.SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
 import Server.Bundle ( BundleSchema, BundleToCardSchema )
 import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
-import TestUtils ( execRuntime )
 
 initTest :: IO ()
-initTest = initDB
+initTest = do
+    initConfig
+    initDB
+
+initConfig :: IO ()
+initConfig = do
+    modifyConfig (\config -> config { cf_database = database })
 
 initDB :: IO ()
 initDB = execRuntime do
-    upsert @BundleSchema undefined
-    upsert @BundleToCardSchema undefined
-    upsert @CardSchema undefined
-    upsert @AttrSchema undefined
-    upsert @ExampleSchema undefined
+    field @BundleSchema upsert
+    field @BundleToCardSchema upsert
+    field @CardSchema upsert
+    field @AttrSchema upsert
+    field @ExampleSchema upsert
     where
         upsert :: (ISchema schema, IConnection conn) => schema -> Runtime conn ()
         upsert schema = do
