@@ -4,6 +4,7 @@ module Init (
 
 import Control.Monad
 
+import Utils ( field )
 import Server.SQL ( execRuntime, runExistTable, runCreateTable, ISchema (..), IConnection, Runtime )
 import Server.Bundle ( BundleSchema, BundleToCardSchema )
 import Server.Card ( CardSchema, AttrSchema, ExampleSchema )
@@ -13,11 +14,11 @@ initApp = initDB
 
 initDB :: IO ()
 initDB = execRuntime do
-    upsert @BundleSchema undefined
-    upsert @BundleToCardSchema undefined
-    upsert @CardSchema undefined
-    upsert @AttrSchema undefined
-    upsert @ExampleSchema undefined
+    field @BundleSchema upsert
+    field @BundleToCardSchema upsert
+    field @CardSchema upsert
+    field @AttrSchema upsert
+    field @ExampleSchema upsert
     where
         upsert :: (ISchema schema, IConnection conn) => schema -> Runtime conn ()
         upsert schema = do

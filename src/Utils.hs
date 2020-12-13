@@ -17,7 +17,8 @@ module Utils (
     shrink,
     same,
     contentEqual,
-    lines
+    lines,
+    field
 ) where
 
 import Prelude hiding ( lines )
@@ -104,3 +105,6 @@ lines :: String -> [String]
 lines str = for (Prelude.lines str) $ \line -> trim line
     where trim line@(last -> '\r') = init line
           trim line = line
+
+field :: (a -> b) -> b
+field f = f undefined
