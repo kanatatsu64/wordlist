@@ -25,7 +25,6 @@ _name = "German"
 _desc :: String
 _desc = "basic german plugin"
 
-
 getPlugin :: MonadFail m => m Plugin
 getPlugin = do
     _uuid <- uuid
